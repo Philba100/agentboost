@@ -49,15 +49,31 @@ function DashboardContent() {
   const handleCheckout = async () => {
     setSubscribing(true);
     try {
-      const res = await fetch('/api/checkout', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user.email, userId: user.id, priceId: API_ACCESS_PRICE_ID })
-      });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
-      else setSubscribing(false);
-    } catch (err) { setSubscribing(false); }
+      // Update user's subscription tier to 'pro' in Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          subscription_tier: 'pro',
+          subscription_end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
+        })
+        .eq('id', user.id);
+      
+      if (!error) {
+        // Update local profile state
+        setProfile({
+          ...profile,
+          subscription_tier: 'pro',
+          subscription_end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
+        });
+        setSubscribing(false);
+      } else {
+        console.error('Error activating plan:', error);
+        setSubscribing(false);
+      }
+    } catch (err) { 
+      console.error('Error:', err);
+      setSubscribing(false); 
+    }
   };
 
   const calculateRemainingDays = () => {

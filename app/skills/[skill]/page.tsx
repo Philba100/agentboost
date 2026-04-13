@@ -1,20 +1,12 @@
-import fs from 'fs';
-import path from 'path';
 import SiteHeader from '../../components/SiteHeader';
 import SiteFooter from '../../components/SiteFooter';
 import Link from 'next/link';
+import SkillViewer from './SkillViewer';
 
 type Props = { params: { skill: string } };
 
-export default async function SkillPage({ params }: Props) {
+export default function SkillPage({ params }: Props) {
   const skillId = params.skill;
-  const mdPath = path.join(process.cwd(), 'skills', skillId, 'SKILL.md');
-  let mdContent: string | null = null;
-  try {
-    mdContent = await fs.promises.readFile(mdPath, 'utf8');
-  } catch (err) {
-    mdContent = null;
-  }
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-[#f8fafc] font-sans antialiased">
@@ -28,13 +20,7 @@ export default async function SkillPage({ params }: Props) {
           </div>
         </div>
 
-        <div className="bg-[#0b1220] border border-slate-800 rounded-lg p-6 text-slate-200 font-mono">
-          {mdContent ? (
-            <pre className="whitespace-pre-wrap text-sm leading-relaxed">{mdContent}</pre>
-          ) : (
-            <p className="text-slate-400">SKILL.md not found for this skill.</p>
-          )}
-        </div>
+        <SkillViewer skillId={skillId} />
       </main>
       <SiteFooter />
     </div>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import SiteHeader from './components/SiteHeader';
 import SiteFooter from './components/SiteFooter';
+import RegistryGrid from './components/RegistryGrid';
 
 export default function Home() {
   const [copied, setCopied] = useState(false);
@@ -33,10 +34,10 @@ except ab.errors.ContextLimitExceeded:
 
   const skills = [
     // Core enterprise skills
-    { id: 'lead-qualifier', icon: '🎯', name: 'Lead Qualifier', desc: 'BANT/MEDDIC lead scoring and qualification.', benefits: ['Composite score', 'Next actions', 'CRM triggers'], url: '/skills/lead-qualifier/SKILL.md', demo: '/skills/lead-qualifier/scripts/index.html' },
+    { id: 'lead-qualifier', icon: '🎯', name: 'Lead Qualifier', desc: 'BANT/MEDDIC lead scoring and qualification.', benefits: ['Composite score', 'Next actions', 'CRM triggers'], url: '/skills/lead-qualifier/SKILL.md', demo: '/skills/lead-qualifier/scripts/index.html', category: 'Marketing' },
     { id: 'meeting-scheduler', icon: '📅', name: 'Meeting Scheduler', desc: 'Calendar sync, proposals, and reminders.', benefits: ['Google/Outlook sync', 'Auto-agenda', 'Reminders'], url: '/skills/meeting-scheduler/SKILL.md', demo: '/skills/meeting-scheduler/scripts/index.html' },
     { id: 'negotiation-engine', icon: '🤝', name: 'Negotiation Engine', desc: 'Objection handling and counter-offer strategies.', benefits: ['Concession sequencing','ROI impact','Audit trail'], url: '/skills/negotiation-engine/SKILL.md', demo: '/skills/negotiation-engine/scripts/index.html' },
-    { id: 'bidding-engine', icon: '🏷️', name: 'Bidding Engine', desc: 'Dynamic pricing and RFQ responses.', benefits: ['Margin optimization','Scenario analysis','Proposal generation'], url: '/skills/bidding-engine/SKILL.md', demo: '/skills/bidding-engine/scripts/index.html' },
+    { id: 'bidding-engine', icon: '🏷️', name: 'Bidding Engine', desc: 'Dynamic pricing and RFQ responses.', benefits: ['Margin optimization','Scenario analysis','Proposal generation'], url: '/skills/bidding-engine/SKILL.md', demo: '/skills/bidding-engine/scripts/index.html', category: 'Finance' },
     { id: 'email-orchestrator', icon: '✉️', name: 'Email Orchestrator', desc: 'Multi-step email sequences with personalization.', benefits: ['A/B testing','Liquid templates','Reply triggers'], url: '/skills/email-orchestrator/SKILL.md', demo: '/skills/email-orchestrator/scripts/index.html' },
     { id: 'crm-sync', icon: '🔗', name: 'CRM Sync', desc: 'Universal CRM integration hub.', benefits: ['Salesforce/HubSpot connectors','Conflict resolution','Audit logs'], url: '/skills/crm-sync/SKILL.md', demo: '/skills/crm-sync/scripts/index.html' },
     { id: 'analytics-hub', icon: '📊', name: 'Analytics Hub', desc: 'Pipeline analytics and forecasting.', benefits: ['Funnel metrics','Forecasts','Custom dashboards'], url: '/skills/analytics-hub/SKILL.md', demo: '/skills/analytics-hub/scripts/index.html' },
@@ -47,28 +48,28 @@ except ab.errors.ContextLimitExceeded:
     { id: 'whatsapp', icon: '💬', name: 'WhatsApp CRM Pro', desc: 'Scalable CRM orchestration and high-conversion automation for enterprise communication.', benefits: ['High-deliverability routing','Liquid-template personalization','Webhook integration'], url: '/skills/whatsapp/SKILL.md', demo: '/skills/whatsapp/scripts/index.html' },
     { id: 'b2b-leads', icon: '🔍', name: 'LeadScraper Pro', desc: 'Extract verified decision-maker contact data from any company domain.', benefits: ['Direct-dial phone numbers','98% Email verification','Salesforce/HubSpot export'], url: '/skills/b2b-leads/SKILL.md', demo: '/skills/b2b-leads/scripts/index.html' },
     { id: 'github-review', icon: '🛡️', name: 'Security Code Pro', desc: 'Comprehensive security review for pull requests, identifying vulnerabilities.', benefits: ['SOC2 compliance scanning','Static & Dynamic analysis','Auto-Fix CLI commands'], url: '/skills/github-review/SKILL.md', demo: '/skills/github-review/scripts/index.html' },
-    { id: 'aws-cost', icon: '☁️', name: 'AWS Cost Optimizer', desc: 'Automated cloud infrastructure scanning to detect idle resources and anomalies.', benefits: ['Idle EC2/EBS detection','One-click cost reduction scripts','IAM-secured read access'], url: '/skills/aws-cost/SKILL.md', demo: '/skills/aws-cost/scripts/index.html' },
+    { id: 'aws-cost', icon: '☁️', name: 'AWS Cost Optimizer', desc: 'Automated cloud infrastructure scanning to detect idle resources and anomalies.', benefits: ['Idle EC2/EBS detection','One-click cost reduction scripts','IAM-secured read access'], url: '/skills/aws-cost/SKILL.md', demo: '/skills/aws-cost/scripts/index.html', category: 'Finance' },
     { id: 'legal-risk', icon: '⚖️', name: 'Legal Counsel Pro', desc: 'High-liability risk assessment for NDAs and enterprise vendor agreements.', benefits: ['IP trap detection','Enforceability risk scoring','Redlined counter-offers'], url: '/skills/legal-risk/SKILL.md', demo: '/skills/legal-risk/scripts/index.htm' },
-    { id: 'seo-audit', icon: '🚀', name: 'SEO Technical Pro', desc: 'Instant technical health checks, crawling sites for ranking bottlenecks.', benefits: ['Core Web Vitals audit','H1/Meta tag optimization','White-label PDF reporting'], url: '/skills/seo-audit/SKILL.md', demo: '/skills/seo-audit/scripts/index.html' },
-    { id: 'linkedin-pro', icon: '👔', name: 'LinkedIn Ghostwriter', desc: 'Generate viral, high-converting social copy optimized for professional feeds.', benefits: ['Scroll-stopping hook generation','A/B tone testing','Automated profile scheduling'], url: '/skills/linkedin-pro/SKILL.md', demo: '/skills/linkedin-pro/scripts/index.html' },
-    { id: 'yt-predictor', icon: '🎥', name: 'Creator Vision Pro', desc: 'Vision AI analysis to predict YouTube thumbnail performance and CTR.', benefits: ['Eye-tracking Heatmap simulation','A/B test concept scoring','Contrast & emotion analysis'], url: '/skills/yt-predictor/SKILL.md', demo: '/skills/yt-predictor/scripts/index.html' },
-    { id: 'stripe-invoice', icon: '💳', name: 'Stripe Invoicer Pro', desc: 'Instantly generate professional invoices and real payment links from a chat prompt.', benefits: ['Stripe Connect integration','Automated receipt generation','Multi-currency support'], url: '/skills/stripe-invoice/SKILL.md', demo: '/skills/stripe-invoice/scripts/index.html' },
+    { id: 'seo-audit', icon: '🚀', name: 'SEO Technical Pro', desc: 'Instant technical health checks, crawling sites for ranking bottlenecks.', benefits: ['Core Web Vitals audit','H1/Meta tag optimization','White-label PDF reporting'], url: '/skills/seo-audit/SKILL.md', demo: '/skills/seo-audit/scripts/index.html', category: 'Marketing' },
+    { id: 'linkedin-pro', icon: '👔', name: 'LinkedIn Ghostwriter', desc: 'Generate viral, high-converting social copy optimized for professional feeds.', benefits: ['Scroll-stopping hook generation','A/B tone testing','Automated profile scheduling'], url: '/skills/linkedin-pro/SKILL.md', demo: '/skills/linkedin-pro/scripts/index.html', category: 'Marketing' },
+    { id: 'yt-predictor', icon: '🎥', name: 'Creator Vision Pro', desc: 'Vision AI analysis to predict YouTube thumbnail performance and CTR.', benefits: ['Eye-tracking Heatmap simulation','A/B test concept scoring','Contrast & emotion analysis'], url: '/skills/yt-predictor/SKILL.md', demo: '/skills/yt-predictor/scripts/index.html', category: 'Marketing' },
+    { id: 'stripe-invoice', icon: '💳', name: 'Stripe Invoicer Pro', desc: 'Instantly generate professional invoices and real payment links from a chat prompt.', benefits: ['Stripe Connect integration','Automated receipt generation','Multi-currency support'], url: '/skills/stripe-invoice/SKILL.md', demo: '/skills/stripe-invoice/scripts/index.html', category: 'Finance' },
 
     // Free / Community skills
     { id: 'telegram-connector-free', icon: '📲', name: 'Telegram Connector (Free)', desc: 'Basic Telegram bot actions and webhooks for small projects.', benefits: ['Send messages','Simple webhooks','Command replies'], url: '/skills/telegram-connector-free/SKILL.md', demo: '/skills/telegram-connector-free/scripts/index.html' },
-    { id: 'slack-lite', icon: '💬', name: 'Slack Lite (Free)', desc: 'Lightweight Slack automation for notifications and quick replies.', benefits: ['Post messages','Slash command handlers','Webhook triggers'], url: '/skills/slack-lite/SKILL.md', demo: '/skills/slack-lite/scripts/index.html' },
+    { id: 'slack-lite', icon: '💬', name: 'Slack Lite (Free)', desc: 'Lightweight Slack automation for notifications and quick replies.', benefits: ['Post messages','Slash command handlers','Webhook triggers'], url: '/skills/slack-lite/SKILL.md', demo: '/skills/slack-lite/scripts/index.html', category: 'Marketing' },
     { id: 'rss-aggregator-free', icon: '📰', name: 'RSS Aggregator (Free)', desc: 'Aggregate RSS feeds into digestible summaries.', benefits: ['Feed consolidation','Daily digests','Simple tagging'], url: '/skills/rss-aggregator-free/SKILL.md', demo: '/skills/rss-aggregator-free/scripts/index.html' },
-    { id: 'public-announcer-free', icon: '📣', name: 'Public Announcer (Free)', desc: 'Post public announcements across channels.', benefits: ['One-click broadcast','Scheduled posts','Basic analytics'], url: '/skills/public-announcer-free/SKILL.md', demo: '/skills/public-announcer-free/scripts/index.html' },
+    { id: 'public-announcer-free', icon: '📣', name: 'Public Announcer (Free)', desc: 'Post public announcements across channels.', benefits: ['One-click broadcast','Scheduled posts','Basic analytics'], url: '/skills/public-announcer-free/SKILL.md', demo: '/skills/public-announcer-free/scripts/index.html', category: 'Marketing' },
     { id: 'calendar-sync-free', icon: '📆', name: 'Calendar Sync (Free)', desc: 'Two-way calendar syncing for personal use.', benefits: ['Read/write events','Basic conflict detection','Timezone handling'], url: '/skills/calendar-sync-free/SKILL.md', demo: '/skills/calendar-sync-free/scripts/index.html' },
 
     // New office apps
     { id: 'office-ops-coordinator', icon: '🏢', name: 'Office Ops Coordinator', desc: 'Facilities, desk bookings and service request orchestration.', benefits: ['Ticketing','Visitor coordination','Resource reservations'], url: '/skills/office-ops-coordinator/SKILL.md', demo: '/skills/office-ops-coordinator/scripts/index.html' },
     { id: 'meeting-minutes-manager', icon: '📝', name: 'Meeting Minutes Manager', desc: 'Summarize meetings and extract action items automatically.', benefits: ['Transcript summarization','Action item extraction','Distribution'], url: '/skills/meeting-minutes-manager/SKILL.md', demo: '/skills/meeting-minutes-manager/scripts/index.html' },
-    { id: 'expense-reporting-bot', icon: '🧾', name: 'Expense Reporting Bot', desc: 'Expense validation, policy checks and finance-ready reports.', benefits: ['Receipt matching','Policy enforcement','Export to accounting'], url: '/skills/expense-reporting-bot/SKILL.md', demo: '/skills/expense-reporting-bot/scripts/index.html' },
+    { id: 'expense-reporting-bot', icon: '🧾', name: 'Expense Reporting Bot', desc: 'Expense validation, policy checks and finance-ready reports.', benefits: ['Receipt matching','Policy enforcement','Export to accounting'], url: '/skills/expense-reporting-bot/SKILL.md', demo: '/skills/expense-reporting-bot/scripts/index.html', category: 'Finance' },
     { id: 'project-status-dashboard', icon: '📈', name: 'Project Status Dashboard', desc: 'Executive project health, milestones and risk reporting.', benefits: ['Risk matrix','Milestone tracking','Executive summaries'], url: '/skills/project-status-dashboard/SKILL.md', demo: '/skills/project-status-dashboard/scripts/index.html' },
     { id: 'hr-onboarding-assistant', icon: '🎓', name: 'HR Onboarding Assistant', desc: 'Onboarding plans, compliance checklists, and follow-ups for new hires.', benefits: ['Custom plans','Document tracking','Mentor assignments'], url: '/skills/hr-onboarding-assistant/SKILL.md', demo: '/skills/hr-onboarding-assistant/scripts/index.html' },
     { id: 'contract-draft-assistant', icon: '📜', name: 'Contract Draft Assistant', desc: 'Draft contracts, redlines and negotiation notes.', benefits: ['Draft templates','Risk callouts','Negotiation suggestions'], url: '/skills/contract-draft-assistant/SKILL.md', demo: '/skills/contract-draft-assistant/scripts/index.html' },
-    { id: 'invoice-payments-manager', icon: '🧾', name: 'Invoice Payments Manager', desc: 'Track invoices, payments, and collections workflows.', benefits: ['Reconciliation','Overdue alerts','Collection plans'], url: '/skills/invoice-payments-manager/SKILL.md', demo: '/skills/invoice-payments-manager/scripts/index.html' },
+    { id: 'invoice-payments-manager', icon: '🧾', name: 'Invoice Payments Manager', desc: 'Track invoices, payments, and collections workflows.', benefits: ['Reconciliation','Overdue alerts','Collection plans'], url: '/skills/invoice-payments-manager/SKILL.md', demo: '/skills/invoice-payments-manager/scripts/index.html', category: 'Finance' },
     { id: 'knowledge-hub-curator', icon: '📚', name: 'Knowledge Hub Curator', desc: 'Curate internal docs and create summaries for teams.', benefits: ['Searchable summaries','Update plan','Content map'], url: '/skills/knowledge-hub-curator/SKILL.md', demo: '/skills/knowledge-hub-curator/scripts/index.html' },
     { id: 'task-prioritization-engine', icon: '⚡', name: 'Task Prioritization Engine', desc: 'Rank tasks by impact, urgency and effort to generate delivery plans.', benefits: ['Priority scoring','Resource plan','Risk notes'], url: '/skills/task-prioritization-engine/SKILL.md', demo: '/skills/task-prioritization-engine/scripts/index.html' },
     { id: 'procurement-bid-coordinator', icon: '🧾', name: 'Procurement Bid Coordinator', desc: 'Compare vendor bids and recommend purchase decisions.', benefits: ['Vendor scoring','Risk assessment','PO generation'], url: '/skills/procurement-bid-coordinator/SKILL.md', demo: '/skills/procurement-bid-coordinator/scripts/index.html' }
@@ -169,50 +170,12 @@ except ab.errors.ContextLimitExceeded:
             </p>
           </div>
           <div className="flex gap-4 border border-slate-800 rounded-md p-1 bg-[#1e293b]">
-             <button className="px-5 py-2 rounded text-[13px] font-medium bg-slate-700 text-white shadow-sm border border-slate-600">All Tools</button>
-             <button className="px-5 py-2 rounded text-[13px] font-medium text-slate-400 hover:text-white transition">Finance</button>
-             <button className="px-5 py-2 rounded text-[13px] font-medium text-slate-400 hover:text-white transition">Marketing</button>
+            <span className="px-5 py-2 rounded text-[13px] font-medium text-slate-400">Filters:</span>
+            <span className="px-5 py-2 rounded text-[13px] font-medium text-slate-400">All / Finance / Marketing</span>
           </div>
         </div>
         
-        {/* 11-Grid Layout */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {skills.map((skill) => (
-            <div key={skill.id} className="group p-8 rounded-2xl bg-[#1e293b] border border-slate-700 hover:border-[#00ff9d]/40 transition-all duration-300 relative overflow-hidden flex flex-col h-full shadow-lg">
-              
-              <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#00ff9d]/5 blur-[60px] rounded-full group-hover:bg-[#00ff9d]/15 transition-all duration-500 pointer-events-none"></div>
-
-              <div className="flex items-start mb-6 relative z-10">
-                <div className="text-3xl p-3 bg-[#0f172a] border border-slate-700 rounded-xl text-white shadow-inner group-hover:border-[#00ff9d]/30 transition-colors">
-                  {skill.icon}
-                </div>
-              </div>
-              
-              <h3 className="text-xl font-semibold mb-2 text-white tracking-tight">{skill.name}</h3>
-              <p className="text-slate-400 text-sm mb-6 leading-relaxed font-light flex-grow">{skill.desc}</p>
-              
-              <div className="space-y-2 mb-8 relative z-10">
-                {skill.benefits.map((benefit, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-[12px] text-slate-300 font-light">
-                    <svg className="w-4 h-4 text-[#00ff9d]/70 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    {benefit}
-                  </div>
-                ))}
-              </div>
-
-              <div className="flex flex-col gap-3 border-t border-slate-700 pt-6 relative z-10">
-                  <Link href={`/skills/${skill.id}`} className="text-center w-full bg-slate-800 border border-slate-600 text-slate-300 px-5 py-3 rounded-lg font-medium text-[12px] hover:bg-slate-700 transition-all">
-                    View Demo / SKILL.md
-                  </Link>
-                  <Link href={`/login?next=/${skill.id}`} className="text-center w-full bg-transparent border border-slate-500 text-white px-5 py-3 rounded-lg font-medium text-[12px] hover:bg-[#00ff9d] hover:text-[#0f172a] hover:border-[#00ff9d] transition-all">
-                    Provision License
-                  </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+        <RegistryGrid skills={skills} />
       </section>
 
       {/* Network Telemetry / Stats */}

@@ -363,7 +363,7 @@ function DashboardContent() {
               <div className="bg-[#0f172a] border border-slate-700 rounded-lg p-6">
                 <h4 className="font-semibold text-white mb-3">📲 Quick Access Link</h4>
                 <p className="text-slate-400 text-sm mb-4">Open this skill on any mobile device:</p>
-                <a href={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?key=${keys[0]?.key_secret?.substring(0, 5)}`} target="_blank" rel="noreferrer" className="block w-full px-4 py-3 bg-[#00ff9d] text-[#0f172a] rounded font-semibold text-sm text-center hover:bg-emerald-400 transition-all">
+                <a href={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?key=${keys[0]?.key_secret?.substring(0, 14)}`} target="_blank" rel="noreferrer" className="block w-full px-4 py-3 bg-[#00ff9d] text-[#0f172a] rounded font-semibold text-sm text-center hover:bg-emerald-400 transition-all">
                   Open {selectedSkill.name} on Mobile
                 </a>
               </div>
@@ -374,13 +374,13 @@ function DashboardContent() {
                 <div className="flex flex-col gap-2">
                   <input 
                     type="text" 
-                    value={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?key=${keys[0]?.key_secret?.substring(0, 5)}`}
+                    value={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?key=${keys[0]?.key_secret?.substring(0, 14)}`}
                     readOnly
                     className="w-full px-3 py-2 bg-[#0b1220] border border-slate-600 rounded text-slate-300 text-xs font-mono"
                   />
                   <button 
                     onClick={() => {
-                      navigator.clipboard.writeText(`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?key=${keys[0]?.key_secret?.substring(0, 5)}`);
+                      navigator.clipboard.writeText(`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?key=${keys[0]?.key_secret?.substring(0, 14)}`);
                       alert('Link copied to clipboard!');
                     }}
                     className="px-4 py-2 bg-slate-700 text-white rounded font-semibold text-sm hover:bg-slate-600 transition-all"

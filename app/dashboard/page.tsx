@@ -2,6 +2,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
+import skills from '@/app/lib/skillsData';
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
@@ -14,6 +15,7 @@ function DashboardContent() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
+  const [selectedSkill, setSelectedSkill] = useState<any>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -28,6 +30,11 @@ function DashboardContent() {
         // Fetch Keys
         const { data: k } = await supabase.from('api_keys').select('*').eq('user_id', session.user.id);
         setKeys(k || []);
+
+        // Set first skill as default
+        if (skills.length > 0) {
+          setSelectedSkill(skills[0]);
+        }
       }
       setLoading(false);
     }
@@ -53,54 +60,213 @@ function DashboardContent() {
     } catch (err) { setSubscribing(false); }
   };
 
-  if (loading) return <div className="min-h-screen bg-[#050505] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#00ff9d] border-t-transparent rounded-full animate-spin"></div></div>;
+  const calculateRemainingDays = () => {
+    if (!profile?.subscription_end_date) return null;
+    const endDate = new Date(profile.subscription_end_date);
+    const today = new Date();
+    const diffTime = endDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+  };
+
+  const isPro = profile?.subscription_tier === 'pro' || profile?.subscription_tier === 'elite';
+  const remainingDays = calculateRemainingDays();
+
+  if (loading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#00ff9d] border-t-transparent rounded-full animate-spin"></div></div>;
 
   if (!user) return (
-    <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center p-6 text-white font-sans">
+    <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center p-6 text-white font-sans">
       <p className="mb-4 text-gray-500 uppercase tracking-widest text-xs">Authentication Required</p>
-      <Link href="/login" className="bg-[#00ff9d] text-black px-6 py-2 rounded font-bold">Sign In</Link>
+      <Link href="/login" className="bg-[#00ff9d] text-[#0f172a] px-6 py-2 rounded font-bold">Sign In</Link>
     </div>
   );
 
-  const isPro = profile?.subscription_tier === 'pro' || profile?.subscription_tier === 'elite';
-
   return (
-    <div className="min-h-screen bg-[#050505] text-[#ededed] p-10 font-sans antialiased">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center border-b border-white/10 pb-6 mb-10">
-          <h1 className="text-3xl font-bold tracking-tight">Operator <span className="text-[#00ff9d] font-light">Console</span></h1>
-          <span className={`px-3 py-1 text-[10px] font-mono uppercase tracking-widest border ${isPro ? 'border-[#00ff9d] text-[#00ff9d]' : 'border-red-500 text-red-500'}`}>
-            STATUS: {isPro ? 'AUTHORIZED' : 'RESTRICTED'}
-          </span>
-        </div>
-
-        {!isPro ? (
-          <div className="bg-[#0a0a0a] border border-white/10 p-10 rounded-2xl text-center relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
-            <h2 className="text-2xl font-bold mb-4 text-white">API Access Locked</h2>
-            <p className="text-white/40 mb-8 text-sm max-w-lg mx-auto leading-relaxed">
-              You must provision an Enterprise API License to generate headless authentication keys for OpenClaw and MCP environments.
-            </p>
-            <button onClick={handleCheckout} disabled={subscribing} className="bg-white text-black font-bold px-10 py-4 rounded-lg text-sm uppercase tracking-widest hover:bg-[#00ff9d] transition-all">
-              {subscribing ? 'Initializing Checkout...' : 'Purchase API License - $199/mo'}
-            </button>
+    <div className="min-h-screen bg-[#0f172a] text-[#f8fafc] font-sans antialiased">
+      {/* Header */}
+      <div className="border-b border-slate-800 bg-[#1e293b]/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+              <p className="text-slate-400 text-sm mt-1">Manage your subscriptions and access skills</p>
+            </div>
+            <div className={`px-4 py-2 rounded-lg border ${isPro ? 'border-[#00ff9d] bg-[#00ff9d]/10 text-[#00ff9d]' : 'border-red-500 bg-red-500/10 text-red-400'} font-mono text-xs font-semibold uppercase tracking-widest`}>
+              {isPro ? '✓ ACTIVE' : 'RESTRICTED'}
+            </div>
           </div>
-        ) : (
-          <div className="bg-[#0a0a0a] p-8 rounded-2xl border border-white/10 shadow-2xl">
-            <h2 className="text-xl font-bold mb-2 text-white">Provisioned Keys</h2>
-            <p className="text-white/40 text-xs mb-8 uppercase tracking-widest font-mono">Do not share these secrets.</p>
-            
-            <div className="space-y-3 mb-8">
-              {keys.length === 0 && <p className="text-white/20 text-sm italic">No keys provisioned yet.</p>}
-              {keys.map(k => (
-                <div key={k.id} className="bg-black p-4 rounded-lg font-mono text-sm border border-white/5 flex justify-between items-center group">
-                  <span className="text-[#00ff9d] opacity-80 group-hover:opacity-100 transition">{k.key_secret}</span>
-                  <span className="text-white/30 uppercase text-[10px] bg-white/5 px-2 py-1 rounded">{k.name}</span>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* User Profile Card */}
+        <div className="bg-gradient-to-br from-[#1e293b] to-[#0f172a] border border-slate-700 rounded-xl p-8 mb-8">
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h2 className="text-sm uppercase text-slate-400 font-semibold tracking-wide mb-2">User Profile</h2>
+              <p className="text-2xl font-bold text-white mb-6">{user?.email}</p>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-xs uppercase text-slate-500 tracking-wider mb-1">Subscription Plan</p>
+                  <p className="text-lg font-semibold text-slate-200 capitalize">{profile?.subscription_tier || 'Free'}</p>
                 </div>
-              ))}
+                {isPro && remainingDays !== null && (
+                  <div>
+                    <p className="text-xs uppercase text-slate-500 tracking-wider mb-1">Days Remaining</p>
+                    <p className={`text-lg font-semibold ${remainingDays > 7 ? 'text-[#00ff9d]' : 'text-orange-400'}`}>
+                      {remainingDays} {remainingDays === 1 ? 'day' : 'days'}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
             
-            <button onClick={generateKey} className="bg-white/5 border border-white/10 text-white font-bold px-6 py-3 rounded-lg text-xs uppercase tracking-widest hover:bg-[#00ff9d] hover:text-black transition-all">
+            <div>
+              <h2 className="text-sm uppercase text-slate-400 font-semibold tracking-wide mb-2">Subscription Info</h2>
+              {isPro ? (
+                <div className="bg-[#00ff9d]/10 border border-[#00ff9d]/30 rounded-lg p-4 mb-4">
+                  <p className="text-[#00ff9d] font-semibold mb-2">✓ Premium Access Active</p>
+                  <p className="text-slate-300 text-sm">You have access to all premium agents and skills. Generate API keys below to use in OpenClaw and MCP environments.</p>
+                </div>
+              ) : (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
+                  <p className="text-red-400 font-semibold mb-2">⚠ Limited Access</p>
+                  <p className="text-slate-300 text-sm">Upgrade to premium to access all features and generate API keys.</p>
+                  <button onClick={handleCheckout} disabled={subscribing} className="mt-3 w-full bg-[#00ff9d] text-[#0f172a] font-bold py-2 rounded-lg text-sm hover:bg-emerald-400 transition-all">
+                    {subscribing ? 'Processing...' : 'Upgrade Now - $199/mo'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Skills Sidebar */}
+          <div className="lg:col-span-1">
+            <h3 className="text-lg font-bold text-white mb-4">Available Skills</h3>
+            <div className="space-y-2 max-h-[600px] overflow-y-auto">
+              {skills.map((skill) => (
+                <button
+                  key={skill.id}
+                  onClick={() => setSelectedSkill(skill)}
+                  className={`w-full text-left p-4 rounded-lg border transition-all ${
+                    selectedSkill?.id === skill.id
+                      ? 'bg-[#00ff9d] border-[#00ff9d] text-[#0f172a] font-semibold'
+                      : 'bg-[#1e293b] border-slate-700 text-slate-200 hover:border-slate-600'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">{skill.icon}</span>
+                    <p className="font-semibold truncate">{skill.name}</p>
+                  </div>
+                  <p className={`text-xs ${selectedSkill?.id === skill.id ? 'text-[#0f172a]/70' : 'text-slate-400'}`}>
+                    {skill.category || 'General'}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Skill Details */}
+          <div className="lg:col-span-2 space-y-6">
+            {selectedSkill ? (
+              <>
+                {/* Skill Header */}
+                <div className="bg-gradient-to-r from-[#1e293b] to-[#0f172a] border border-slate-700 rounded-xl p-8">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div className="text-5xl">{selectedSkill.icon}</div>
+                    <div className="flex-1">
+                      <h2 className="text-3xl font-bold text-white mb-2">{selectedSkill.name}</h2>
+                      <p className="text-slate-400 mb-3">{selectedSkill.desc}</p>
+                      {selectedSkill.category && (
+                        <span className="inline-block px-3 py-1 bg-[#00ff9d] text-[#0f172a] text-xs font-semibold rounded">
+                          {selectedSkill.category}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Features */}
+                <div className="bg-[#1e293b] border border-slate-700 rounded-xl p-6">
+                  <h3 className="text-xl font-bold text-white mb-4">Key Features</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {selectedSkill.benefits.map((benefit: string, idx: number) => (
+                      <div key={idx} className="flex items-start gap-3 p-3 bg-[#0f172a] rounded-lg">
+                        <span className="text-[#00ff9d] font-bold">✓</span>
+                        <span className="text-slate-300">{benefit}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* How to Get It */}
+                <div className="bg-[#1e293b] border border-slate-700 rounded-xl p-6">
+                  <h3 className="text-xl font-bold text-white mb-4">How to Access</h3>
+                  <div className="space-y-4">
+                    {isPro ? (
+                      <>
+                        <div className="bg-[#0f172a] border-l-4 border-[#00ff9d] p-4 rounded">
+                          <h4 className="font-semibold text-white mb-2">1. View Full Documentation</h4>
+                          <p className="text-slate-400 text-sm mb-3">Read the complete skill documentation and examples.</p>
+                          <Link href={`/skills/${selectedSkill.id}`} className="inline-block px-4 py-2 bg-[#00ff9d] text-[#0f172a] rounded font-semibold text-sm hover:bg-emerald-400 transition-all">
+                            View Skill Docs
+                          </Link>
+                        </div>
+
+                        <div className="bg-[#0f172a] border-l-4 border-[#00ff9d] p-4 rounded">
+                          <h4 className="font-semibold text-white mb-2">2. Try the Interactive Demo</h4>
+                          <p className="text-slate-400 text-sm mb-3">Test the skill with sample data in the interactive playground.</p>
+                          <a href={`/skills/${selectedSkill.id}/scripts/index.html`} target="_blank" rel="noreferrer" className="inline-block px-4 py-2 bg-[#00ff9d] text-[#0f172a] rounded font-semibold text-sm hover:bg-emerald-400 transition-all">
+                            Open Demo
+                          </a>
+                        </div>
+
+                        <div className="bg-[#0f172a] border-l-4 border-[#00ff9d] p-4 rounded">
+                          <h4 className="font-semibold text-white mb-2">3. Access via OpenClaw</h4>
+                          <p className="text-slate-400 text-sm mb-3">Use your API keys to integrate this skill into OpenClaw agents.</p>
+                          <p className="text-slate-300 text-xs font-mono">agent.mount(client.skills.get('{selectedSkill.id}'))</p>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-lg">
+                        <p className="text-red-400 font-semibold mb-2">🔒 Premium Feature</p>
+                        <p className="text-slate-300 text-sm mb-4">Upgrade your subscription to access this skill and all others.</p>
+                        <button onClick={handleCheckout} disabled={subscribing} className="w-full bg-[#00ff9d] text-[#0f172a] font-bold py-2 rounded-lg text-sm hover:bg-emerald-400 transition-all">
+                          {subscribing ? 'Processing...' : 'Unlock Premium - $199/mo'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-12 text-slate-400">Select a skill from the list to view details</div>
+            )}
+          </div>
+        </div>
+
+        {/* API Keys Section - Only for Pro Users */}
+        {isPro && (
+          <div className="mt-12 bg-[#1e293b] border border-slate-700 rounded-xl p-8">
+            <h3 className="text-xl font-bold text-white mb-4">API Keys for OpenClaw</h3>
+            <p className="text-slate-400 mb-6 text-sm">Generate and manage headless authentication keys for your OpenClaw and MCP environments.</p>
+            
+            {keys.length > 0 && (
+              <div className="space-y-3 mb-6">
+                <p className="text-xs uppercase text-slate-500 font-semibold tracking-wider mb-3">Active Keys ({keys.length})</p>
+                {keys.map(k => (
+                  <div key={k.id} className="bg-[#0f172a] p-4 rounded-lg font-mono text-xs border border-slate-700 flex justify-between items-center group">
+                    <span className="text-[#00ff9d] opacity-80 group-hover:opacity-100 transition break-all">{k.key_secret}</span>
+                    <span className="text-slate-400 uppercase text-[10px] bg-slate-800/50 px-2 py-1 rounded ml-2 shrink-0">{k.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            <button onClick={generateKey} className="bg-[#00ff9d] text-[#0f172a] font-bold px-6 py-3 rounded-lg text-sm uppercase tracking-widest hover:bg-emerald-400 transition-all">
               + Generate New Key
             </button>
           </div>

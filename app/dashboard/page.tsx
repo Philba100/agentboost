@@ -23,8 +23,12 @@ function DashboardContent() {
       if (session?.user) {
         setUser(session.user);
         
-        // Fetch Profile Tier
-        let { data: prof, error: profError } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+        // Fetch Profile Tier with all fields including share_token
+        let { data: prof, error: profError } = await supabase
+          .from('profiles')
+          .select('id, full_name, subscription_tier, share_token, updated_at')
+          .eq('id', session.user.id)
+          .single();
         
         // If profile doesn't exist, create it
         if (profError || !prof) {
@@ -35,7 +39,7 @@ function DashboardContent() {
               full_name: session.user.user_metadata?.full_name || '',
               subscription_tier: 'starter'
             }])
-            .select()
+            .select('id, full_name, subscription_tier, share_token, updated_at')
             .single();
           
           prof = newProf;
@@ -111,10 +115,10 @@ function DashboardContent() {
       }
       
       if (!updateError) {
-        // Refetch the updated profile
+        // Refetch the updated profile with all fields
         const { data: updatedProfile, error: refetchError } = await supabase
           .from('profiles')
-          .select('*')
+          .select('id, full_name, subscription_tier, share_token, updated_at')
           .eq('id', user.id)
           .single();
         
@@ -371,7 +375,7 @@ function DashboardContent() {
               <div className="bg-[#0f172a] border border-slate-700 rounded-lg p-6">
                 <h4 className="font-semibold text-white mb-3">📲 Quick Access Link</h4>
                 <p className="text-slate-400 text-sm mb-4">Open this skill on any mobile device:</p>
-                <a href={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?token=${profile?.share_token}`} target="_blank" rel="noreferrer" className="block w-full px-4 py-3 bg-[#00ff9d] text-[#0f172a] rounded font-semibold text-sm text-center hover:bg-emerald-400 transition-all">
+                <a href={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}`} target="_blank" rel="noreferrer" className="block w-full px-4 py-3 bg-[#00ff9d] text-[#0f172a] rounded font-semibold text-sm text-center hover:bg-emerald-400 transition-all">
                   Open {selectedSkill.name} on Mobile
                 </a>
               </div>
@@ -382,13 +386,13 @@ function DashboardContent() {
                 <div className="flex flex-col gap-2">
                   <input 
                     type="text" 
-                    value={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?token=${profile?.share_token}`}
+                    value={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}`}
                     readOnly
                     className="w-full px-3 py-2 bg-[#0b1220] border border-slate-600 rounded text-slate-300 text-xs font-mono"
                   />
                   <button 
                     onClick={() => {
-                      navigator.clipboard.writeText(`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?token=${profile?.share_token}`);
+                      navigator.clipboard.writeText(`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}`);
                       alert('Link copied to clipboard!');
                     }}
                     className="px-4 py-2 bg-slate-700 text-white rounded font-semibold text-sm hover:bg-slate-600 transition-all"
@@ -401,7 +405,7 @@ function DashboardContent() {
 
             <div className="mt-6 bg-[#0f172a] border-l-4 border-[#00ff9d] rounded-lg p-4">
               <p className="text-slate-300 text-sm">
-                <strong>💡 Tip:</strong> Save the mobile link as a bookmark or home screen shortcut for quick access to {selectedSkill.name} on any device.
+                <strong>💡 Tip:</strong> Links are valid only for active subscriptions. Share them with your team - they'll be verified automatically when accessed.
               </p>
             </div>
           </div>

@@ -33,16 +33,21 @@ function LoginContent() {
 
   const handleSignUp = async () => {
     setIsLoading(true);
-    const { error } = await supabase.auth.signUp({ 
+    const { error, data } = await supabase.auth.signUp({ 
         email, 
         password,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextDestination)}` } 
+        options: { 
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextDestination)}`
+        } 
     });
     if (error) {
       alert(error.message);
       setIsLoading(false);
+    } else if (data?.user?.identities?.length === 0) {
+      alert('This email is already registered. Please sign in instead.');
+      setIsLoading(false);
     } else {
-      alert('Provisioning link sent. Check your secure inbox.');
+      alert('Confirmation link sent to your email. Please check your inbox and click the link to complete registration.');
       setIsLoading(false);
     }
   };

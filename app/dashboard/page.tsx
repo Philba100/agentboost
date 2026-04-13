@@ -84,8 +84,7 @@ function DashboardContent() {
           .insert([{
             id: user.id,
             full_name: user.user_metadata?.full_name || '',
-            subscription_tier: 'pro',
-            subscription_end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
+            subscription_tier: 'pro'
           }]);
         updateError = insertError;
       } else {
@@ -93,8 +92,7 @@ function DashboardContent() {
         const { error: updateErr } = await supabase
           .from('profiles')
           .update({ 
-            subscription_tier: 'pro',
-            subscription_end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
+            subscription_tier: 'pro'
           })
           .eq('id', user.id);
         updateError = updateErr;
@@ -110,7 +108,7 @@ function DashboardContent() {
         
         if (updatedProfile && !refetchError) {
           setProfile(updatedProfile);
-          alert('✓ Plan activated successfully!');
+          alert('✓ Pro Plan Activated! Your subscription renews monthly.');
         } else {
           alert('Profile updated but refresh failed. Please refresh the page.');
           console.error('Refetch error:', refetchError);
@@ -128,10 +126,11 @@ function DashboardContent() {
   };
 
   const calculateRemainingDays = () => {
-    if (!profile?.subscription_end_date) return null;
-    const endDate = new Date(profile.subscription_end_date);
+    if (!profile?.updated_at) return null;
+    const activatedDate = new Date(profile.updated_at);
+    const renewalDate = new Date(activatedDate.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days from activation
     const today = new Date();
-    const diffTime = endDate.getTime() - today.getTime();
+    const diffTime = renewalDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays > 0 ? diffDays : 0;
   };
@@ -177,9 +176,9 @@ function DashboardContent() {
                   <p className="text-xs uppercase text-slate-500 tracking-wider mb-1">Subscription Plan</p>
                   <p className="text-lg font-semibold text-slate-200 capitalize">{profile?.subscription_tier || 'Free'}</p>
                 </div>
-                {isPro && remainingDays !== null && (
+            {isPro && remainingDays !== null && (
                   <div>
-                    <p className="text-xs uppercase text-slate-500 tracking-wider mb-1">Days Remaining</p>
+                    <p className="text-xs uppercase text-slate-500 tracking-wider mb-1">Days Until Renewal</p>
                     <p className={`text-lg font-semibold ${remainingDays > 7 ? 'text-[#00ff9d]' : 'text-orange-400'}`}>
                       {remainingDays} {remainingDays === 1 ? 'day' : 'days'}
                     </p>
@@ -192,8 +191,9 @@ function DashboardContent() {
               <h2 className="text-sm uppercase text-slate-400 font-semibold tracking-wide mb-2">Subscription Info</h2>
               {isPro ? (
                 <div className="bg-[#00ff9d]/10 border border-[#00ff9d]/30 rounded-lg p-4 mb-4">
-                  <p className="text-[#00ff9d] font-semibold mb-2">✓ Premium Access Active</p>
-                  <p className="text-slate-300 text-sm">You have access to all premium agents and skills. Generate API keys below to use in OpenClaw and MCP environments.</p>
+                  <p className="text-[#00ff9d] font-semibold mb-2">✓ Pro Plan Active</p>
+                  <p className="text-slate-300 text-sm mb-2">Your subscription renews monthly. You have access to all premium agents and skills. Generate API keys below to use in OpenClaw and MCP environments.</p>
+                  <p className="text-slate-400 text-xs">Renews: {remainingDays !== null ? `in ${remainingDays} days` : 'monthly'}</p>
                 </div>
               ) : (
                 <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">

@@ -131,9 +131,9 @@ function DashboardContent() {
               ) : (
                 <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
                   <p className="text-red-400 font-semibold mb-2">⚠ Limited Access</p>
-                  <p className="text-slate-300 text-sm">Upgrade to premium to access all features and generate API keys.</p>
+                  <p className="text-slate-300 text-sm">Activate your free plan to access all features and generate API keys.</p>
                   <button onClick={handleCheckout} disabled={subscribing} className="mt-3 w-full bg-[#00ff9d] text-[#0f172a] font-bold py-2 rounded-lg text-sm hover:bg-emerald-400 transition-all">
-                    {subscribing ? 'Processing...' : 'Upgrade Now - $199/mo'}
+                    {subscribing ? 'Processing...' : 'Activate Free Plan'}
                   </button>
                 </div>
               )}
@@ -233,9 +233,9 @@ function DashboardContent() {
                     ) : (
                       <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-lg">
                         <p className="text-red-400 font-semibold mb-2">🔒 Premium Feature</p>
-                        <p className="text-slate-300 text-sm mb-4">Upgrade your subscription to access this skill and all others.</p>
+                        <p className="text-slate-300 text-sm mb-4">Activate your free subscription to access this skill and all others.</p>
                         <button onClick={handleCheckout} disabled={subscribing} className="w-full bg-[#00ff9d] text-[#0f172a] font-bold py-2 rounded-lg text-sm hover:bg-emerald-400 transition-all">
-                          {subscribing ? 'Processing...' : 'Unlock Premium - $199/mo'}
+                          {subscribing ? 'Processing...' : 'Activate Free Plan'}
                         </button>
                       </div>
                     )}

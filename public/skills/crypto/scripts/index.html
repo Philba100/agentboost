@@ -1,0 +1,75 @@
+
+### 2. Android Bridge Script (`webview-bridge.html`)
+The bridge script must be fault-tolerant. We implement strict input validation, URL sanitization to prevent injection attacks, and standardized telemetry for the Android host.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentBoost MCP Bridge</title>
+</head>
+<body>
+    <script>
+        /**
+         * Enterprise Webview Bridge for AgentBoost MCP
+         * @param {string} rawData - Stringified JSON payload from the LLM/Agent
+         * @returns {Promise<string>} Stringified JSON response for the Android host
+         */
+        const executeAgentBoostSkill = async function(rawData) {
+            const BASE_URL = 'https://agentboost-seven.vercel.app/crypto';
+            
+            try {
+                if (!rawData || typeof rawData !== 'string') {
+                    throw new Error('Invalid payload format. Expected JSON string.');
+                }
+
+                const parsedData = JSON.parse(rawData);
+                
+                // Sanitize and validate parameters
+                const params = new URLSearchParams({
+                    asset: String(parsedData.asset || 'BTC').toUpperCase().trim(),
+                    timeframe: String(parsedData.timeframe || '7D').toUpperCase().trim(),
+                    risk: String(parsedData.risk_level || 'Medium').trim(),
+                    t: Date.now().toString() // Cache buster
+                });
+
+                const targetUrl = `${BASE_URL}?${params.toString()}`;
+
+                // Return strictly formatted schema expected by the native host
+                return JSON.stringify({
+                    status: 200,
+                    webview: {
+                        url: targetUrl,
+                        safeMode: true
+                    },
+                    telemetry: {
+                        action: 'skill_execution',
+                        timestamp: new Date().toISOString()
+                    }
+                });
+
+            } catch (error) {
+                console.error('[AgentBoost Bridge Error]:', error.message);
+                
+                // Fallback deterministic error state
+                const errorParams = new URLSearchParams({ 
+                    error: 'validation_failed',
+                    message: encodeURIComponent(error.message)
+                });
+                
+                return JSON.stringify({
+                    status: 400,
+                    webview: {
+                        url: `${BASE_URL}?${errorParams.toString()}`
+                    }
+                });
+            }
+        };
+        
+        // Attach to window object for native Android bindings
+        window.ai_edge_gallery_get_result = executeAgentBoostSkill;
+    </script>
+</body>
+</html>

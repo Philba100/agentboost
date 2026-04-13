@@ -1,0 +1,52 @@
+
+### 3. Agent Bridge: `index.html` **Path:** `C:\Users\Administrator\agentboost\public\skills\legal-risk\scripts\index.html`
+
+Upgraded with secure parsing, fallback values, ES6 standards, and proper URL parameter encoding.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Risk Analyzer Agent Bridge</title>
+</head>
+<body>
+<script>
+    /**
+     * Enterprise Standard: Async execution with strict try/catch
+     * Converts JSON payload from LLM into a safe URL query string.
+     */
+    const ai_edge_gallery_get_result = async function(data) {
+        try {
+            if (!data) throw new Error("No payload provided");
+            
+            const jsonObj = JSON.parse(data);
+            
+            // Standard URLSearchParams for safe encoding
+            const params = new URLSearchParams({
+                contract_type: jsonObj.contract_type || 'General Contract',
+                focus_clause: jsonObj.focus_clause || 'Liability'
+            });
+
+            return JSON.stringify({
+                webview: {
+                    url: `https://agentboost-seven.vercel.app/legal-risk?${params.toString()}`
+                }
+            });
+        } catch (error) {
+            console.error("Agent Bridge Error:", error);
+            // Graceful degradation: Pass error flag to the UI
+            return JSON.stringify({
+                webview: { 
+                    url: `https://agentboost-seven.vercel.app/legal-risk?error=invalid_payload` 
+                }
+            });
+        }
+    };
+
+    // Attach to global window object for LLM runtime access
+    window.ai_edge_gallery_get_result = ai_edge_gallery_get_result;
+</script>
+</body>
+</html>

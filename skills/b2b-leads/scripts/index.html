@@ -1,0 +1,58 @@
+
+### 3. Agent Bridge: `index.html` **Upgrades:** Moved away from legacy `var`, implemented standard ES6 features, added robust error handling, URL encoding, and input validation. If the payload is malformed, it now securely passes an error context back so the frontend can handle it natively.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B2B Lead Gen execution context</title>
+</head>
+<body>
+<script>
+    /**
+     * Enterprise Standard: Async IIFE or strongly typed arrow functions
+     * Intercepts the run_js execution from the AI agent and formats the WebView output.
+     */
+    window.ai_edge_gallery_get_result = async (data) => {
+        const BASE_URL = 'https://agentboost-seven.vercel.app/b2b-leads';
+        
+        try {
+            if (!data) throw new Error("Missing payload data");
+            
+            const jsonObj = JSON.parse(data);
+            
+            // Input Validation and Sanitization
+            const domain = (jsonObj.company_domain || 'example.com').trim().toLowerCase();
+            const role = (jsonObj.role || 'Decision Maker').trim();
+
+            const params = new URLSearchParams({
+                domain: domain,
+                role: role
+            });
+
+            return JSON.stringify({
+                webview: {
+                    url: `${BASE_URL}?${params.toString()}`
+                }
+            });
+        } catch (error) {
+            console.error("Agent execution error:", error);
+            
+            // Pass the specific error securely back to the frontend
+            const errorParams = new URLSearchParams({
+                error: 'true',
+                message: error.message || 'Malformed JSON payload'
+            });
+
+            return JSON.stringify({
+                webview: { 
+                    url: `${BASE_URL}?${errorParams.toString()}` 
+                }
+            });
+        }
+    };
+</script>
+</body>
+</html>

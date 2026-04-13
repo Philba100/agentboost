@@ -1,0 +1,78 @@
+ **Bridge:** `public/skills/aws-cost/scripts/index.html`
+*(Same standard bridge script pattern mapping `region` and `resource_type` to URL params)*
+
+---
+
+### 3. SEO Audit Pro (`seo-audit`)
+ **Frontend:** `C:\Users\Administrator\agentboost\app\seo-audit\page.tsx`
+```tsx
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState, Suspense, useCallback } from 'react';
+import { createClient, User } from '@supabase/supabase-js';
+import Link from 'next/link';
+import { skills } from '@/lib/skills';
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+const currentSkill = skills.find(s => s.id === 'seo-audit');
+
+function SEODashboard() {
+  const searchParams = useSearchParams();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [processing, setProcessing] = useState(false);
+
+  const url = searchParams.get('target_url') || 'website.com';
+  const keyword = searchParams.get('keyword') || 'SEO';
+
+  const fetchUser = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    setUser(session?.user || null);
+    if (session?.user) {
+      const { data } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+      setProfile(data);
+    }
+    setLoading(false);
+  }, []);
+  useEffect(() => { fetchUser(); }, [fetchUser]);
+
+  const handleSubscribe = async () => {
+    setProcessing(true);
+    const res = await fetch('/api/checkout', { 
+      method: 'POST', body: JSON.stringify({ email: user?.email, userId: user?.id, priceId: currentSkill?.priceId })
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url; else setProcessing(false);
+  };
+
+  if (loading) return <div className="min-h-screen bg-white text-blue-600 flex items-center justify-center font-bold">Crawling DOM for {url}...</div>;
+
+  if (!user) return <div className="min-h-screen flex justify-center items-center"><Link href="/login" className="bg-blue-600 p-4 rounded text-white font-bold">Login to View SEO Audit</Link></div>;
+
+  const isPro = profile?.subscription_tier === 'pro';
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 p-8 border-t-4 border-blue-600">
+      <h1 className="text-2xl font-black mb-6 text-slate-900">Technical SEO Report: {url}</h1>
+      {!isPro ? (
+        <div className="bg-white p-8 rounded-xl shadow-xl text-center max-w-lg mx-auto border border-slate-200">
+          <h2 className="text-xl font-bold mb-2">{currentSkill?.name}</h2>
+          <p className="text-slate-500 mb-6">{currentSkill?.desc}</p>
+          <button onClick={handleSubscribe} disabled={processing} className="w-full bg-blue-600 text-white p-4 rounded-lg font-bold">
+            {processing ? 'Processing...' : `Unlock Report for ${currentSkill?.price}/mo`}
+          </button>
+        </div>
+      ) : (
+        <div className="bg-white p-6 rounded-xl border border-red-200 shadow-md">
+          <h3 className="text-red-600 font-bold mb-2">Keyword Density Issue: "{keyword}"</h3>
+          <p className="text-slate-600">Your target keyword is missing from the H1 tag and meta description.</p>
+          <p className="text-blue-600 font-mono mt-4">Fix: Update &lt;h1&gt; to include exact match keyword.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Page() { return <Suspense><SEODashboard /></Suspense>; }

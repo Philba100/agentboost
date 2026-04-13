@@ -1,0 +1,71 @@
+
+### 2. Android Bridge Script (`webview-bridge.html`)
+Upgraded to include aggressive input sanitization, error boundaries, and telemetry formatting for native Android/iOS host environments.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentBoost Comms Bridge</title>
+</head>
+<body>
+    <script>
+        /**
+         * Enterprise Webview Bridge for WhatsApp Orchestration
+         * Intercepts LLM payload, sanitizes, and routes to Next.js Application
+         */
+        const executeAgentBoostSkill = async function(rawData) {
+            const BASE_URL = 'https://agentboost-seven.vercel.app/whatsapp';
+            
+            try {
+                if (!rawData || typeof rawData !== 'string') {
+                    throw new Error('ERR_INVALID_PAYLOAD: Expected stringified JSON.');
+                }
+
+                const parsedData = JSON.parse(rawData);
+                
+                // Strict Sanitization & URI Encoding
+                const params = new URLSearchParams({
+                    status: encodeURIComponent(String(parsedData.status || 'success').trim()),
+                    aud: encodeURIComponent(String(parsedData.audience || 'Global Contacts').trim()),
+                    msg: encodeURIComponent(String(parsedData.message || '').trim()),
+                    camp: encodeURIComponent(String(parsedData.campaign_name || 'Automated Broadcast').trim()),
+                    time: encodeURIComponent(String(parsedData.schedule_time || 'Immediate').trim()),
+                    tz: encodeURIComponent(String(parsedData.timezone || 'UTC').trim()),
+                    req_id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString()
+                });
+
+                return JSON.stringify({
+                    status: 200,
+                    webview: {
+                        url: `${BASE_URL}?${params.toString()}`,
+                        safeMode: true
+                    },
+                    telemetry: {
+                        module: 'whatsapp_crm',
+                        timestamp: new Date().toISOString()
+                    }
+                });
+
+            } catch (error) {
+                console.error('[Bridge Telemetry]:', error.message);
+                
+                const fallbackParams = new URLSearchParams({ 
+                    status: 'error', 
+                    code: 'PAYLOAD_MALFORMED' 
+                });
+                
+                return JSON.stringify({
+                    status: 400,
+                    webview: { url: `${BASE_URL}?${fallbackParams.toString()}` }
+                });
+            }
+        };
+        
+        // Expose to native mobile bridge (Edge Gallery / Openclaw)
+        window.ai_edge_gallery_get_result = executeAgentBoostSkill;
+    </script>
+</body>
+</html>

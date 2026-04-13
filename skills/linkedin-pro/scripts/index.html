@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en"><body><script>
+    var ai_edge_gallery_get_result = async function(data) {
+        try {
+            const jsonObj = JSON.parse(data);
+            const params = new URLSearchParams({
+                topic: jsonObj.topic || 'General Business',
+                tone: jsonObj.tone || 'Inspirational'
+            });
+
+            return JSON.stringify({
+                webview: {
+                    url: `https://agentboost-seven.vercel.app/linkedin-pro?${params.toString()}`
+                }
+            });
+        } catch (error) {
+            return JSON.stringify({
+                webview: { url: `https://agentboost-seven.vercel.app/linkedin-pro?error=true` }
+            });
+        }
+    };
+    window.ai_edge_gallery_get_result = ai_edge_gallery_get_result;
+</script></body></html>

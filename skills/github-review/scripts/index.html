@@ -1,0 +1,11 @@
+ **Bridge:** `public/skills/github-review/scripts/index.html`
+```html
+<!DOCTYPE html><html lang="en"><body><script>
+    window.ai_edge_gallery_get_result = async (data) => {
+        try {
+            const parsed = JSON.parse(data);
+            const params = new URLSearchParams({ repo_url: parsed.repo_url || '', pr_number: parsed.pr_number || '' });
+            return JSON.stringify({ webview: { url: `https://agentboost-seven.vercel.app/github-review?${params.toString()}` } });
+        } catch (e) { return JSON.stringify({ webview: { url: `https://agentboost-seven.vercel.app/github-review?error=true` } }); }
+    };
+</script></body></html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"><body><script>
+    var ai_edge_gallery_get_result = async function(data) {
+        try {
+            const jsonObj = JSON.parse(data);
+            const params = new URLSearchParams({
+                email: jsonObj.client_email || 'client@example.com',
+                amount: jsonObj.amount || 0,
+                desc: jsonObj.description || 'Consulting Services'
+            });
+
+            return JSON.stringify({
+                webview: {
+                    url: `https://agentboost-seven.vercel.app/stripe-invoice?${params.toString()}`
+                }
+            });
+        } catch (error) {
+            return JSON.stringify({
+                webview: { url: `https://agentboost-seven.vercel.app/stripe-invoice?error=true` }
+            });
+        }
+    };
+    window.ai_edge_gallery_get_result = ai_edge_gallery_get_result;
+</script></body></html>

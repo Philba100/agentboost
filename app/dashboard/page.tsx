@@ -59,12 +59,16 @@ function DashboardContent() {
         .eq('id', user.id);
       
       if (!error) {
-        // Update local profile state
-        setProfile({
-          ...profile,
-          subscription_tier: 'pro',
-          subscription_end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
-        });
+        // Refetch the updated profile
+        const { data: updatedProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        if (updatedProfile) {
+          setProfile(updatedProfile);
+        }
         setSubscribing(false);
       } else {
         console.error('Error activating plan:', error);

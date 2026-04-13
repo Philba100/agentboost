@@ -13,14 +13,44 @@ interface SkillDetail {
   category?: string;
 }
 
-export default function SkillViewer({ skillId }: { skillId: string }) {
+export default function SkillViewer({ skillId, shareToken }: { skillId: string; shareToken?: string }) {
   const [md, setMd] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'openclaw' | 'mobile'>('overview');
+  const [validating, setValidating] = useState(!!shareToken);
+  const [tokenValid, setTokenValid] = useState(!shareToken);
   
   const skill = skills.find(s => s.id === skillId) as SkillDetail | undefined;
 
+  // Validate token if provided
   useEffect(() => {
+    if (!shareToken) {
+      setValidating(false);
+      setTokenValid(true);
+      return;
+    }
+
+    const validateToken = async () => {
+      try {
+        const response = await fetch(`/api/validate-token?token=${encodeURIComponent(shareToken)}`);
+        const data = await response.json();
+        setTokenValid(data.valid);
+        if (!data.valid) {
+          setErr('Share link expired or invalid. Please get a new link from the dashboard.');
+        }
+      } catch (e) {
+        setTokenValid(false);
+        setErr('Failed to validate access');
+      }
+      setValidating(false);
+    };
+
+    validateToken();
+  }, [shareToken]);
+
+  useEffect(() => {
+    if (!tokenValid) return;
+    
     let mounted = true;
     fetch(`/api/skill-md?id=${encodeURIComponent(skillId)}`)
       .then((r) => r.json())
@@ -34,27 +64,47 @@ export default function SkillViewer({ skillId }: { skillId: string }) {
         setErr('Failed to load');
       });
     return () => { mounted = false; };
-  }, [skillId]);
+  }, [skillId, tokenValid]);
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      {skill && (
-        <div className="bg-gradient-to-r from-[#1e293b] to-[#0f172a] border border-slate-700 rounded-lg p-8">
-          <div className="flex items-start gap-4">
-            <div className="text-5xl">{skill.icon}</div>
-            <div className="flex-1">
-              <h1 className="text-4xl font-bold text-white mb-2">{skill.name}</h1>
-              <p className="text-slate-400 text-lg mb-4">{skill.desc}</p>
-              {skill.category && (
-                <span className="inline-block px-3 py-1 bg-[#00ff9d] text-[#0f172a] text-sm font-semibold rounded">
-                  {skill.category}
-                </span>
-              )}
-            </div>
-          </div>
+      {/* Validation State */}
+      {validating && (
+        <div className="bg-[#1e293b] border border-slate-700 rounded-lg p-8 text-center">
+          <div className="w-8 h-8 border-2 border-[#00ff9d] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-400">Validating access...</p>
         </div>
       )}
+
+      {!validating && !tokenValid && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-8 text-center">
+          <p className="text-red-400 font-semibold mb-2 text-lg">Access Denied</p>
+          <p className="text-slate-300 mb-4">{err || 'Share link expired or invalid. Please get a new link from the dashboard.'}</p>
+          <a href="/dashboard" className="inline-block px-6 py-2 bg-[#00ff9d] text-[#0f172a] rounded font-semibold hover:bg-emerald-400 transition-all">
+            Go to Dashboard
+          </a>
+        </div>
+      )}
+
+      {!validating && tokenValid && (
+        <>
+          {/* Header */}
+          {skill && (
+            <div className="bg-gradient-to-r from-[#1e293b] to-[#0f172a] border border-slate-700 rounded-lg p-8">
+              <div className="flex items-start gap-4">
+                <div className="text-5xl">{skill.icon}</div>
+                <div className="flex-1">
+                  <h1 className="text-4xl font-bold text-white mb-2">{skill.name}</h1>
+                  <p className="text-slate-400 text-lg mb-4">{skill.desc}</p>
+                  {skill.category && (
+                    <span className="inline-block px-3 py-1 bg-[#00ff9d] text-[#0f172a] text-sm font-semibold rounded">
+                      {skill.category}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
       {/* Tabs */}
       <div className="flex gap-4 border-b border-slate-700">
@@ -308,6 +358,8 @@ export default function SkillViewer({ skillId }: { skillId: string }) {
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }

@@ -3,10 +3,11 @@ import SiteFooter from '../../components/SiteFooter';
 import Link from 'next/link';
 import SkillViewer from './SkillViewer';
 
-type Props = { params: { skill: string } };
+type Props = { params: { skill: string }, searchParams: { token?: string } };
 
-export default function SkillPage({ params }: Props) {
+export default function SkillPage({ params, searchParams }: Props) {
   const skillId = params.skill;
+  const token = searchParams.token;
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-[#f8fafc] font-sans antialiased">
@@ -20,7 +21,7 @@ export default function SkillPage({ params }: Props) {
           </div>
         </div>
 
-        <SkillViewer skillId={skillId} />
+        <SkillViewer skillId={skillId} shareToken={token} />
       </main>
       <SiteFooter />
     </div>

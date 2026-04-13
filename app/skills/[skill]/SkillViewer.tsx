@@ -13,14 +13,44 @@ interface SkillDetail {
   category?: string;
 }
 
-export default function SkillViewer({ skillId }: { skillId: string }) {
+export default function SkillViewer({ skillId, keyParam }: { skillId: string; keyParam?: string }) {
   const [md, setMd] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'openclaw' | 'mobile'>('overview');
+  const [validating, setValidating] = useState(!!keyParam);
+  const [keyValid, setKeyValid] = useState(!keyParam);
   
   const skill = skills.find(s => s.id === skillId) as SkillDetail | undefined;
 
+  // Validate key if provided in URL
   useEffect(() => {
+    if (!keyParam) {
+      setValidating(false);
+      setKeyValid(true);
+      return;
+    }
+
+    const validateKey = async () => {
+      try {
+        const response = await fetch(`/api/validate-token?key=${encodeURIComponent(keyParam)}`);
+        const data = await response.json();
+        setKeyValid(data.valid);
+        if (!data.valid) {
+          setErr('Access denied. Invalid or expired subscription key.');
+        }
+      } catch (e) {
+        setKeyValid(false);
+        setErr('Failed to validate access');
+      }
+      setValidating(false);
+    };
+
+    validateKey();
+  }, [keyParam]);
+
+  useEffect(() => {
+    if (!keyValid) return;
+    
     let mounted = true;
     fetch(`/api/skill-md?id=${encodeURIComponent(skillId)}`)
       .then((r) => r.json())
@@ -34,11 +64,30 @@ export default function SkillViewer({ skillId }: { skillId: string }) {
         setErr('Failed to load');
       });
     return () => { mounted = false; };
-  }, [skillId]);
+  }, [skillId, keyValid]);
 
   return (
     <div className="space-y-8">
-      {/* Header */}
+      {/* Validation State */}
+      {validating && (
+        <div className="bg-[#1e293b] border border-slate-700 rounded-lg p-8 text-center">
+          <div className="w-8 h-8 border-2 border-[#00ff9d] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-400">Validating access...</p>
+        </div>
+      )}
+
+      {!validating && !keyValid && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-8 text-center">
+          <p className="text-red-400 font-semibold mb-2 text-lg">Access Denied</p>
+          <p className="text-slate-300 mb-4">{err}</p>
+          <a href="/dashboard" className="inline-block px-6 py-2 bg-[#00ff9d] text-[#0f172a] rounded font-semibold hover:bg-emerald-400 transition-all">
+            Go to Dashboard
+          </a>
+        </div>
+      )}
+
+      {!validating && keyValid && (
+        <>
       {skill && (
         <div className="bg-gradient-to-r from-[#1e293b] to-[#0f172a] border border-slate-700 rounded-lg p-8">
           <div className="flex items-start gap-4">
@@ -308,6 +357,8 @@ export default function SkillViewer({ skillId }: { skillId: string }) {
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }

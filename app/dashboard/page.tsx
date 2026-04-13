@@ -24,8 +24,27 @@ function DashboardContent() {
         setUser(session.user);
         
         // Fetch Profile Tier
-        const { data: prof } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-        setProfile(prof);
+        let { data: prof, error: profError } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+        
+        // If profile doesn't exist, create it
+        if (profError || !prof) {
+          const { data: newProf, error: insertError } = await supabase
+            .from('profiles')
+            .insert([{
+              id: session.user.id,
+              full_name: session.user.user_metadata?.full_name || '',
+              subscription_tier: 'starter'
+            }])
+            .select()
+            .single();
+          
+          prof = newProf;
+          profError = insertError;
+        }
+        
+        if (prof) {
+          setProfile(prof);
+        }
 
         // Fetch Keys
         const { data: k } = await supabase.from('api_keys').select('*').eq('user_id', session.user.id);
@@ -49,33 +68,61 @@ function DashboardContent() {
   const handleCheckout = async () => {
     setSubscribing(true);
     try {
-      // Update user's subscription tier to 'pro' in Supabase
-      const { error } = await supabase
+      // First, check if profile exists
+      const { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
-        .update({ 
-          subscription_tier: 'pro',
-          subscription_end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
-        })
-        .eq('id', user.id);
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      let updateError;
       
-      if (!error) {
+      if (!existingProfile) {
+        // Profile doesn't exist, create it
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert([{
+            id: user.id,
+            full_name: user.user_metadata?.full_name || '',
+            subscription_tier: 'pro',
+            subscription_end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
+          }]);
+        updateError = insertError;
+      } else {
+        // Profile exists, update it
+        const { error: updateErr } = await supabase
+          .from('profiles')
+          .update({ 
+            subscription_tier: 'pro',
+            subscription_end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString()
+          })
+          .eq('id', user.id);
+        updateError = updateErr;
+      }
+      
+      if (!updateError) {
         // Refetch the updated profile
-        const { data: updatedProfile } = await supabase
+        const { data: updatedProfile, error: refetchError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
         
-        if (updatedProfile) {
+        if (updatedProfile && !refetchError) {
           setProfile(updatedProfile);
+          alert('✓ Plan activated successfully!');
+        } else {
+          alert('Profile updated but refresh failed. Please refresh the page.');
+          console.error('Refetch error:', refetchError);
         }
-        setSubscribing(false);
       } else {
-        console.error('Error activating plan:', error);
-        setSubscribing(false);
+        alert('Error activating plan: ' + updateError.message);
+        console.error('Update error:', updateError);
       }
+      setSubscribing(false);
     } catch (err) { 
       console.error('Error:', err);
+      alert('Error: ' + (err as Error).message);
       setSubscribing(false); 
     }
   };

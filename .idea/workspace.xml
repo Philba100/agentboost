@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b5d40a1c-8786-4ccb-9f1f-e745f2151ae0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/app/docs/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/docs/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/skills/aws-cost/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/public/skills/aws-cost/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/skills/b2b-leads/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/public/skills/b2b-leads/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/skills/crypto/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/public/skills/crypto/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/skills/github-review/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/public/skills/github-review/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/skills/linkedin-pro/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/public/skills/linkedin-pro/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/skills/real-estate/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/public/skills/real-estate/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/skills/seo-audit/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/public/skills/seo-audit/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/skills/stripe-invoice/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/public/skills/stripe-invoice/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/skills/whatsapp/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/public/skills/whatsapp/SKILL.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/skills/yt-predictor/SKILL.md" beforeDir="false" afterPath="$PROJECT_DIR$/public/skills/yt-predictor/SKILL.md" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="3C7jVATUUdMzieHqYzzWe67qWJG" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/agentboost"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b5d40a1c-8786-4ccb-9f1f-e745f2151ae0" name="Changes" comment="" />
+      <created>1775743523917</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1775743523917</updated>
+    </task>
+    <servers />
+  </component>
+</project>

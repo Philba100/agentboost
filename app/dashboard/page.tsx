@@ -23,10 +23,10 @@ function DashboardContent() {
       if (session?.user) {
         setUser(session.user);
         
-        // Fetch Profile Tier with all fields including share_token
+        // Fetch Profile Tier
         let { data: prof, error: profError } = await supabase
           .from('profiles')
-          .select('id, full_name, subscription_tier, share_token, updated_at')
+          .select('id, full_name, subscription_tier, updated_at')
           .eq('id', session.user.id)
           .single();
         
@@ -39,7 +39,7 @@ function DashboardContent() {
               full_name: session.user.user_metadata?.full_name || '',
               subscription_tier: 'starter'
             }])
-            .select('id, full_name, subscription_tier, share_token, updated_at')
+            .select('id, full_name, subscription_tier, updated_at')
             .single();
           
           prof = newProf;
@@ -69,19 +69,9 @@ function DashboardContent() {
     if (data) setKeys([...keys, ...data]);
   };
 
-  const generateRandomToken = () => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let token = '';
-    for (let i = 0; i < 32; i++) {
-      token += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return token;
-  };
-
   const handleCheckout = async () => {
     setSubscribing(true);
     try {
-      const newToken = generateRandomToken();
       // First, check if profile exists
       const { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
@@ -98,8 +88,7 @@ function DashboardContent() {
           .insert([{
             id: user.id,
             full_name: user.user_metadata?.full_name || '',
-            subscription_tier: 'pro',
-            share_token: newToken
+            subscription_tier: 'pro'
           }]);
         updateError = insertError;
       } else {
@@ -107,8 +96,7 @@ function DashboardContent() {
         const { error: updateErr } = await supabase
           .from('profiles')
           .update({ 
-            subscription_tier: 'pro',
-            share_token: newToken
+            subscription_tier: 'pro'
           })
           .eq('id', user.id);
         updateError = updateErr;
@@ -118,7 +106,7 @@ function DashboardContent() {
         // Refetch the updated profile with all fields
         const { data: updatedProfile, error: refetchError } = await supabase
           .from('profiles')
-          .select('id, full_name, subscription_tier, share_token, updated_at')
+          .select('id, full_name, subscription_tier, updated_at')
           .eq('id', user.id)
           .single();
         

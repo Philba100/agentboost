@@ -17,7 +17,6 @@ export default function SkillPage({ params, searchParams }: Props) {
           <h1 className="text-3xl font-semibold">{skillId.replace(/-/g, ' ')}</h1>
           <div className="flex gap-3">
             <Link href={`/skills/${skillId}/scripts/index.html`} className="px-4 py-2 bg-slate-800 border border-slate-700 rounded text-sm">Open Demo</Link>
-            <a href={`/skills/${skillId}/SKILL.md`} className="px-4 py-2 bg-transparent border border-slate-700 rounded text-sm">Raw SKILL.md</a>
           </div>
         </div>
 

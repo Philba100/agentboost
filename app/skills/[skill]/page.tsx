@@ -24,7 +24,7 @@ export default async function SkillPage({ params, searchParams }: Props) {
         <div className="mb-8">
           <h1 className="text-3xl font-semibold mb-4">{displayName}</h1>
           <div className="flex gap-3">
-            <a href={`/skills/${skillId}/scripts/index.html`} target="_blank" rel="noreferrer" className="px-4 py-2 bg-slate-800 border border-slate-700 rounded text-sm hover:bg-slate-700 transition">Open Demo</a>
+            <Link href={`/skills/${skillId}/demo`} className="px-4 py-2 bg-slate-800 border border-slate-700 rounded text-sm hover:bg-slate-700 transition">Open Demo</Link>
             <Link href="/dashboard" className="px-4 py-2 bg-slate-800 border border-slate-700 rounded text-sm hover:bg-slate-700 transition">← Back to Dashboard</Link>
           </div>
         </div>

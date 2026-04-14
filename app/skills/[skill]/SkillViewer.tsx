@@ -345,9 +345,7 @@ export default function SkillViewer({ skillId, keyParam }: { skillId: string; ke
                 Click below to open an interactive demo of this skill in your browser.
               </p>
               <a
-                href={`/skills/${skillId}/scripts/index.html`}
-                target="_blank"
-                rel="noreferrer"
+                href={`/skills/${skillId}/demo`}
                 className="block w-full text-center px-4 py-3 bg-[#00ff9d] text-[#0f172a] rounded font-semibold hover:bg-[#00e085] transition"
               >
                 Open Demo

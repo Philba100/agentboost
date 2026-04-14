@@ -51,7 +51,8 @@ export async function createShareLink(
 
     if (error) {
       console.error('Error creating share link:', error);
-      return null;
+      // Throw an error so the caller can access the error details
+      throw error;
     }
 
     // Generate full share URL
@@ -64,7 +65,7 @@ export async function createShareLink(
     };
   } catch (error) {
     console.error('Error in createShareLink:', error);
-    return null;
+    throw error;
   }
 }
 

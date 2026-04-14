@@ -18,6 +18,7 @@ function DashboardContent() {
   const [selectedSkill, setSelectedSkill] = useState<any>(null);
   const [shareLink, setShareLink] = useState<string>('');
   const [generatingLink, setGeneratingLink] = useState(false);
+  const [shareTableMissing, setShareTableMissing] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -98,8 +99,16 @@ function DashboardContent() {
         if (response.ok) {
           const data = await response.json();
           setShareLink(data.shareUrl);
+          setShareTableMissing(false);
         } else {
-          console.error('Failed to generate share link:', response.statusText);
+          const errorData = await response.json();
+          // Check if it's a table missing error
+          if (errorData.error?.includes('table not found') || errorData.error?.includes('Share links table')) {
+            setShareTableMissing(true);
+          } else {
+            setShareTableMissing(false);
+          }
+          console.error('Failed to generate share link:', errorData.error);
           setShareLink('');
         }
       } catch (error) {
@@ -498,7 +507,55 @@ function DashboardContent() {
               <div className="bg-[#0f172a] border border-slate-700 rounded-lg p-6">
                 <h4 className="font-semibold text-white mb-3">🔗 Unique Share Link</h4>
                 <p className="text-slate-400 text-sm mb-4">Share this skill with team members (unique for each skill):</p>
-                {generatingLink ? (
+                {shareTableMissing ? (
+                  <div className="bg-red-900/20 border border-red-600 rounded-lg p-4 text-center">
+                    <p className="text-red-400 font-semibold mb-3">⚠️ Setup Required</p>
+                    <p className="text-red-300 text-sm mb-4">
+                      The share_links table needs to be created in your Supabase database.
+                    </p>
+                    <details className="text-left">
+                      <summary className="text-red-300 cursor-pointer font-semibold mb-3 hover:text-red-200">
+                        ▶ Click to see setup instructions
+                      </summary>
+                      <div className="bg-[#0b1220] p-3 rounded border border-slate-700 mt-3">
+                        <p className="text-slate-300 text-xs font-mono whitespace-pre-wrap break-words">
+                          1. Go to your Supabase project dashboard
+                          <br/>2. Open the SQL Editor
+                          <br/>3. Create a new query and paste the SQL below:
+                        </p>
+                        <div className="mt-3 bg-[#0f172a] p-3 rounded border border-slate-600">
+                          <code className="text-[#00ff9d] text-xs font-mono block overflow-x-auto" style={{maxHeight: '300px', overflowY: 'auto'}}>
+{`CREATE TABLE IF NOT EXISTS share_links (
+  share_id VARCHAR(36) PRIMARY KEY,
+  skill_id VARCHAR(255) NOT NULL,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP WITH TIME ZONE,
+  view_count INTEGER DEFAULT 0,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_share_links_share_id ON share_links(share_id);
+CREATE INDEX IF NOT EXISTS idx_share_links_user_id ON share_links(user_id);
+CREATE INDEX IF NOT EXISTS idx_share_links_skill_id ON share_links(skill_id);
+CREATE INDEX IF NOT EXISTS idx_share_links_created_at ON share_links(created_at DESC);
+
+ALTER TABLE share_links ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY share_links_select_public ON share_links FOR SELECT USING (true);
+CREATE POLICY share_links_insert_own ON share_links FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY share_links_update_own ON share_links FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY share_links_delete_own ON share_links FOR DELETE USING (auth.uid() = user_id);`}
+                          </code>
+                        </div>
+                        <p className="text-slate-300 text-xs mt-3">
+                          4. Run the query
+                          <br/>5. Refresh this page
+                        </p>
+                      </div>
+                    </details>
+                  </div>
+                ) : generatingLink ? (
                   <div className="w-full px-4 py-2 bg-slate-700 text-slate-400 rounded text-sm text-center">
                     Generating link...
                   </div>

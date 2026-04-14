@@ -32,36 +32,50 @@ export default function SkillViewer({ skillId, keyParam }: { skillId: string; ke
 
     const validateKey = async () => {
       try {
-        const response = await fetch(`/api/validate-token?key=${encodeURIComponent(keyParam)}`);
+        const response = await fetch(`/api/validate-token?key=${encodeURIComponent(keyParam)}&skill=${encodeURIComponent(skillId)}`);
         const data = await response.json();
-        setKeyValid(data.valid);
-        if (!data.valid) {
-          setErr('Access denied. Invalid or expired subscription key.');
+        if (data.valid) {
+          setKeyValid(true);
+          setErr(null);
+        } else {
+          setKeyValid(false);
+          setErr(`Access denied: ${data.error || 'Invalid key'}`);
         }
       } catch (e) {
         setKeyValid(false);
-        setErr('Failed to validate access');
+        setErr(`Validation error: ${(e as Error).message}`);
       }
       setValidating(false);
     };
 
     validateKey();
-  }, [keyParam]);
+  }, [keyParam, skillId]);
 
   useEffect(() => {
     if (!keyValid) return;
     
     let mounted = true;
     fetch(`/api/skill-md?id=${encodeURIComponent(skillId)}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) {
+          throw new Error(`HTTP ${r.status}`);
+        }
+        return r.json();
+      })
       .then((data) => {
         if (!mounted) return;
-        if (data.content) setMd(data.content);
-        else setErr('SKILL.md not found');
+        if (data.content) {
+          setMd(data.content);
+          setErr(null);
+        } else if (data.error) {
+          setErr(`File error: ${data.error}`);
+        } else {
+          setErr('SKILL.md not found');
+        }
       })
-      .catch(() => {
+      .catch((err) => {
         if (!mounted) return;
-        setErr('Failed to load');
+        setErr(`Failed to load documentation: ${err.message}`);
       });
     return () => { mounted = false; };
   }, [skillId, keyValid]);

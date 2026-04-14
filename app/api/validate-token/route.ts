@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import skills from '@/app/lib/skillsData';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,16 +11,30 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const keyPrefix = searchParams.get('key');
+    const skillId = searchParams.get('skill');
 
     if (!keyPrefix) {
       return NextResponse.json({ valid: false, error: 'No key provided' }, { status: 401 });
     }
 
+    // Find the skill
+    const skill = skills.find(s => s.id === skillId);
+    
+    // RULE 1: Free skills always accessible
+    if (skill && skill.free) {
+      return NextResponse.json({ 
+        valid: true,
+        type: 'free-skill',
+        message: 'Free skill - always accessible'
+      });
+    }
+
+    // RULE 2: For paid skills, check user's subscription
     // Find API key that starts with this prefix
     const { data: apiKeys, error: fetchError } = await supabase
       .from('api_keys')
       .select('user_id, key_secret')
-      .limit(1000); // Fetch all to check prefix
+      .limit(1000);
 
     if (fetchError || !apiKeys) {
       return NextResponse.json({ valid: false, error: 'Invalid request' }, { status: 401 });
@@ -43,21 +58,28 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ valid: false, error: 'User not found' }, { status: 401 });
     }
 
-    // Check if subscription is active (within 30 days)
-    const activatedDate = new Date(profile.updated_at);
-    const renewalDate = new Date(activatedDate.getTime() + 30 * 24 * 60 * 60 * 1000);
-    const today = new Date();
-
-    if (profile.subscription_tier === 'pro' && renewalDate > today) {
+    // RULE 3: Enterprise users have access to everything
+    if (profile.subscription_tier === 'enterprise') {
       return NextResponse.json({ 
-        valid: true, 
-        userId: matchingKey.user_id,
-        tier: profile.subscription_tier,
-        expiresAt: renewalDate.toISOString()
+        valid: true,
+        type: 'enterprise',
+        message: 'Enterprise tier - full access'
       });
     }
 
-    return NextResponse.json({ valid: false, error: 'Subscription expired' }, { status: 401 });
+    // RULE 4: For Pro users, they can access skills they've purchased
+    // For now, we're restricting to only free skills and enterprise for paid skills
+    // In the future, check user_skills table for individual purchases
+    if (profile.subscription_tier === 'pro') {
+      // TODO: Check user_skills table for this specific skill_id
+      return NextResponse.json({ 
+        valid: false, 
+        error: 'Upgrade required - this skill is not in your tier',
+        needsUpgrade: true
+      }, { status: 401 });
+    }
+
+    return NextResponse.json({ valid: false, error: 'Subscription verification failed' }, { status: 401 });
   } catch (error) {
     console.error('Token validation error:', error);
     return NextResponse.json({ valid: false, error: 'Server error' }, { status: 500 });

@@ -37,7 +37,7 @@ function DashboardContent() {
             .insert([{
               id: session.user.id,
               full_name: session.user.user_metadata?.full_name || '',
-              subscription_tier: 'starter'
+              subscription_tier: 'free'
             }])
             .select('id, full_name, subscription_tier, updated_at')
             .single();
@@ -67,6 +67,36 @@ function DashboardContent() {
   const generateKey = async () => {
     const { data } = await supabase.from('api_keys').insert([{ user_id: user.id }]).select();
     if (data) setKeys([...keys, ...data]);
+  };
+
+  const handleUpgradeEnterprise = async () => {
+    setSubscribing(true);
+    try {
+      const { error: updateErr } = await supabase
+        .from('profiles')
+        .update({ subscription_tier: 'enterprise' })
+        .eq('id', user.id);
+      
+      if (!updateErr) {
+        const { data: updatedProfile, error: refetchError } = await supabase
+          .from('profiles')
+          .select('id, full_name, subscription_tier, updated_at')
+          .eq('id', user.id)
+          .single();
+        
+        if (updatedProfile && !refetchError) {
+          setProfile(updatedProfile);
+          alert('✓ Enterprise Plan Activated! You now have access to all skills.');
+        }
+      } else {
+        alert('Error upgrading plan: ' + updateErr.message);
+      }
+      setSubscribing(false);
+    } catch (err) {
+      console.error('Error:', err);
+      alert('Error: ' + (err as Error).message);
+      setSubscribing(false);
+    }
   };
 
   const handleCheckout = async () => {
@@ -139,7 +169,13 @@ function DashboardContent() {
     return diffDays > 0 ? diffDays : 0;
   };
 
-  const isPro = profile?.subscription_tier === 'pro' || profile?.subscription_tier === 'elite';
+  // Get free vs paid skills
+  const freeSkills = skills.filter(s => s.free === true);
+  const paidSkills = skills.filter(s => s.free !== true);
+  
+  const isFree = profile?.subscription_tier === 'free';
+  const isPro = profile?.subscription_tier === 'pro';
+  const isEnterprise = profile?.subscription_tier === 'enterprise';
   const remainingDays = calculateRemainingDays();
 
   if (loading) return <div className="min-h-screen bg-[#0f172a] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#00ff9d] border-t-transparent rounded-full animate-spin"></div></div>;
@@ -161,8 +197,12 @@ function DashboardContent() {
               <h1 className="text-3xl font-bold text-white">Dashboard</h1>
               <p className="text-slate-400 text-sm mt-1">Manage your subscriptions and access skills</p>
             </div>
-            <div className={`px-4 py-2 rounded-lg border ${isPro ? 'border-[#00ff9d] bg-[#00ff9d]/10 text-[#00ff9d]' : 'border-red-500 bg-red-500/10 text-red-400'} font-mono text-xs font-semibold uppercase tracking-widest`}>
-              {isPro ? '✓ ACTIVE' : 'RESTRICTED'}
+            <div className={`px-4 py-2 rounded-lg border font-mono text-xs font-semibold uppercase tracking-widest ${
+              isEnterprise ? 'border-[#00ff9d] bg-[#00ff9d]/10 text-[#00ff9d]' :
+              isPro ? 'border-blue-500 bg-blue-500/10 text-blue-400' :
+              'border-slate-600 bg-slate-600/10 text-slate-300'
+            }`}>
+              {isEnterprise ? '✓ ENTERPRISE' : isPro ? '✓ PRO' : '○ FREE'}
             </div>
           </div>
         </div>
@@ -193,19 +233,28 @@ function DashboardContent() {
             
             <div>
               <h2 className="text-sm uppercase text-slate-400 font-semibold tracking-wide mb-2">Subscription Info</h2>
-              {isPro ? (
+              {isEnterprise ? (
                 <div className="bg-[#00ff9d]/10 border border-[#00ff9d]/30 rounded-lg p-4 mb-4">
-                  <p className="text-[#00ff9d] font-semibold mb-2">✓ Pro Plan Active</p>
-                  <p className="text-slate-300 text-sm mb-2">Your subscription renews monthly. You have access to all premium agents and skills. Generate API keys below to use in OpenClaw and MCP environments.</p>
-                  <p className="text-slate-400 text-xs">Renews: {remainingDays !== null ? `in ${remainingDays} days` : 'monthly'}</p>
+                  <p className="text-[#00ff9d] font-semibold mb-2">🚀 Enterprise Plan Active</p>
+                  <p className="text-slate-300 text-sm">Full access to all {skills.length} skills. Unlimited usage and API access.</p>
+                </div>
+              ) : isPro ? (
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
+                  <p className="text-blue-400 font-semibold mb-2">✓ Pro Plan Active</p>
+                  <p className="text-slate-300 text-sm mb-3">You have access to 5 free skills + purchased premium skills.</p>
+                  <button onClick={handleUpgradeEnterprise} disabled={subscribing} className="w-full bg-[#00ff9d] text-[#0f172a] font-bold py-2 rounded-lg text-sm hover:bg-emerald-400 transition-all">
+                    {subscribing ? 'Processing...' : 'Upgrade to Enterprise'}
+                  </button>
                 </div>
               ) : (
-                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
-                  <p className="text-red-400 font-semibold mb-2">⚠ Limited Access</p>
-                  <p className="text-slate-300 text-sm">Activate your free plan to access all features and generate API keys.</p>
-                  <button onClick={handleCheckout} disabled={subscribing} className="mt-3 w-full bg-[#00ff9d] text-[#0f172a] font-bold py-2 rounded-lg text-sm hover:bg-emerald-400 transition-all">
-                    {subscribing ? 'Processing...' : 'Activate Free Plan'}
-                  </button>
+                <div className="bg-slate-700/30 border border-slate-600 rounded-lg p-4 mb-4">
+                  <p className="text-slate-300 font-semibold mb-2">○ Free Plan</p>
+                  <p className="text-slate-300 text-sm mb-2">Access {freeSkills.length} free skills. Upgrade to access {paidSkills.length} premium skills.</p>
+                  <div className="space-y-2 mt-3">
+                    <button onClick={handleUpgradeEnterprise} disabled={subscribing} className="w-full bg-[#00ff9d] text-[#0f172a] font-bold py-2 rounded-lg text-sm hover:bg-emerald-400 transition-all">
+                      {subscribing ? 'Processing...' : 'Upgrade to Enterprise'}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -216,27 +265,49 @@ function DashboardContent() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Skills Sidebar */}
           <div className="lg:col-span-1">
-            <h3 className="text-lg font-bold text-white mb-4">Available Skills</h3>
+            <h3 className="text-lg font-bold text-white mb-2">Available Skills</h3>
+            <p className="text-xs text-slate-400 mb-4">{freeSkills.length} free • {paidSkills.length} premium</p>
             <div className="space-y-2 max-h-[600px] overflow-y-auto">
-              {skills.map((skill) => (
+              {skills.map((skill) => {
+                const isFreeSkill = skill.free === true;
+                const canAccess = isFreeSkill || isEnterprise || (isPro && skill.free !== true);
+                
+                return (
                 <button
                   key={skill.id}
                   onClick={() => setSelectedSkill(skill)}
+                  disabled={!canAccess && isFree}
                   className={`w-full text-left p-4 rounded-lg border transition-all ${
                     selectedSkill?.id === skill.id
                       ? 'bg-[#00ff9d] border-[#00ff9d] text-[#0f172a] font-semibold'
-                      : 'bg-[#1e293b] border-slate-700 text-slate-200 hover:border-slate-600'
+                      : isFreeSkill
+                      ? 'bg-[#1e293b] border-slate-700 text-slate-200 hover:border-slate-600'
+                      : isEnterprise || (isPro && skill.free !== true)
+                      ? 'bg-[#1e293b] border-blue-700/50 text-slate-200 hover:border-blue-600'
+                      : 'bg-[#0f172a] border-slate-800 text-slate-400 opacity-60 cursor-not-allowed'
                   }`}
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-lg">{skill.icon}</span>
-                    <p className="font-semibold truncate">{skill.name}</p>
+                  <div className="flex items-center gap-2 mb-1 justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{skill.icon}</span>
+                      <p className="font-semibold truncate">{skill.name}</p>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded whitespace-nowrap ${
+                      isFreeSkill
+                        ? 'bg-green-600/20 text-green-400'
+                        : isEnterprise || (isPro && skill.free !== true)
+                        ? 'bg-blue-600/20 text-blue-400'
+                        : 'bg-slate-600/20 text-slate-400'
+                    }`}>
+                      {isFreeSkill ? 'FREE' : isEnterprise ? 'ALL' : isPro ? 'PRO' : 'LOCKED'}
+                    </span>
                   </div>
                   <p className={`text-xs ${selectedSkill?.id === skill.id ? 'text-[#0f172a]/70' : 'text-slate-400'}`}>
                     {skill.category || 'General'}
                   </p>
                 </button>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -277,7 +348,7 @@ function DashboardContent() {
                 <div className="bg-[#1e293b] border border-slate-700 rounded-xl p-6">
                   <h3 className="text-xl font-bold text-white mb-4">How to Access</h3>
                   <div className="space-y-4">
-                    {isPro ? (
+                    {selectedSkill.free || isEnterprise ? (
                       <>
                         <div className="bg-[#0f172a] border-l-4 border-[#00ff9d] p-4 rounded">
                           <h4 className="font-semibold text-white mb-2">1. View Full Documentation</h4>
@@ -295,26 +366,30 @@ function DashboardContent() {
                           </a>
                         </div>
 
-                        <div className="bg-[#0f172a] border-l-4 border-[#00ff9d] p-4 rounded">
-                          <h4 className="font-semibold text-white mb-2">3. Access via OpenClaw</h4>
-                          <p className="text-slate-400 text-sm mb-3">Use your API keys to integrate this skill into OpenClaw agents.</p>
-                          <p className="text-slate-300 text-xs font-mono">agent.mount(client.skills.get('{selectedSkill.id}'))</p>
-                        </div>
+                        {(isEnterprise) && (
+                          <>
+                            <div className="bg-[#0f172a] border-l-4 border-[#00ff9d] p-4 rounded">
+                              <h4 className="font-semibold text-white mb-2">3. Access via OpenClaw</h4>
+                              <p className="text-slate-400 text-sm mb-3">Use your API keys to integrate this skill into OpenClaw agents.</p>
+                              <p className="text-slate-300 text-xs font-mono">agent.mount(client.skills.get('{selectedSkill.id}'))</p>
+                            </div>
 
-                        <div className="bg-[#0f172a] border-l-4 border-[#00ff9d] p-4 rounded">
-                          <h4 className="font-semibold text-white mb-2">4. Access on Mobile & Edge Gallery</h4>
-                          <p className="text-slate-400 text-sm mb-3">Use this skill on mobile devices through the Edge Gallery.</p>
-                          <a href={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}`} target="_blank" rel="noreferrer" className="inline-block px-4 py-2 bg-[#00ff9d] text-[#0f172a] rounded font-semibold text-sm hover:bg-emerald-400 transition-all">
-                            Open in Edge Gallery
-                          </a>
-                        </div>
+                            <div className="bg-[#0f172a] border-l-4 border-[#00ff9d] p-4 rounded">
+                              <h4 className="font-semibold text-white mb-2">4. Access on Mobile & Edge Gallery</h4>
+                              <p className="text-slate-400 text-sm mb-3">Use this skill on mobile devices through the Edge Gallery.</p>
+                              <a href={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}`} target="_blank" rel="noreferrer" className="inline-block px-4 py-2 bg-[#00ff9d] text-[#0f172a] rounded font-semibold text-sm hover:bg-emerald-400 transition-all">
+                                Open in Edge Gallery
+                              </a>
+                            </div>
+                          </>
+                        )}
                       </>
                     ) : (
-                      <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-lg">
-                        <p className="text-red-400 font-semibold mb-2">🔒 Premium Feature</p>
-                        <p className="text-slate-300 text-sm mb-4">Activate your free subscription to access this skill and all others.</p>
-                        <button onClick={handleCheckout} disabled={subscribing} className="w-full bg-[#00ff9d] text-[#0f172a] font-bold py-2 rounded-lg text-sm hover:bg-emerald-400 transition-all">
-                          {subscribing ? 'Processing...' : 'Activate Free Plan'}
+                      <div className="bg-slate-800/30 border border-slate-700 p-6 rounded-lg text-center">
+                        <p className="text-slate-300 font-semibold mb-3">🔒 Premium Skill</p>
+                        <p className="text-slate-400 text-sm mb-4">This skill requires an Enterprise subscription to access.</p>
+                        <button onClick={handleUpgradeEnterprise} disabled={subscribing} className="w-full bg-[#00ff9d] text-[#0f172a] font-bold py-2 rounded-lg text-sm hover:bg-emerald-400 transition-all">
+                          {subscribing ? 'Processing...' : 'Upgrade to Enterprise'}
                         </button>
                       </div>
                     )}
@@ -327,8 +402,8 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* API Keys Section - Only for Pro Users */}
-        {isPro && (
+        {/* API Keys Section - For Enterprise Users */}
+        {isEnterprise && (
           <div className="mt-12 bg-[#1e293b] border border-slate-700 rounded-xl p-8">
             <h3 className="text-xl font-bold text-white mb-4">API Keys for OpenClaw</h3>
             <p className="text-slate-400 mb-6 text-sm">Generate and manage headless authentication keys for your OpenClaw and MCP environments.</p>
@@ -352,7 +427,7 @@ function DashboardContent() {
         )}
 
         {/* Edge Gallery Mobile Access */}
-        {isPro && selectedSkill && keys.length > 0 && (
+        {isEnterprise && selectedSkill && keys.length > 0 && (
           <div className="mt-8 bg-gradient-to-r from-[#1e293b] to-[#0f172a] border border-slate-700 rounded-xl p-8">
             <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
               <span>📱</span> Access on Mobile & Edge Gallery
@@ -399,7 +474,7 @@ function DashboardContent() {
           </div>
         )}
 
-        {isPro && selectedSkill && keys.length === 0 && (
+        {isEnterprise && selectedSkill && keys.length === 0 && (
           <div className="mt-8 bg-gradient-to-r from-[#1e293b] to-[#0f172a] border border-yellow-700 rounded-xl p-8">
             <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
               <span>📱</span> Access on Mobile & Edge Gallery

@@ -11,8 +11,8 @@ Need help with AgentBoost? Here's how to get support.
 
 | Issue Type | Contact Method | Priority |
 |-----------|-----------|----------|
-| Bug reports | GitHub Issues | High |
-| Feature requests | GitHub Discussions | Medium |
+| Bug reports | [GitHub Issues](https://github.com/Philba100/agentboost/issues) | High |
+| Feature requests | [GitHub Discussions](https://github.com/Philba100/agentboost/discussions) | Medium |
 | General questions | Email or Discussions | Medium |
 | Security issues | Email (private) | Critical |
 | Enterprise support | Email with SLA details | High |
@@ -21,7 +21,7 @@ Need help with AgentBoost? Here's how to get support.
 
 ## 🐛 Reporting Bugs
 
-Please report bugs through [GitHub Issues](https://github.com/phillipmbanda/agentboost/issues) with:
+Please report bugs through [GitHub Issues](https://github.com/Philba100/agentboost/issues) with:
 
 1. **Clear title** — Brief description of the bug
 2. **Steps to reproduce** — How to trigger the issue
@@ -47,7 +47,7 @@ Description:
 ## 💬 GitHub Discussions
 
 For questions and discussions:
-- [GitHub Discussions](https://github.com/phillipmbanda/agentboost/discussions)
+- [GitHub Discussions](https://github.com/Philba100/agentboost/discussions)
 - Ask questions about features
 - Share tips and tricks
 - Discuss use cases
@@ -176,7 +176,7 @@ For production deployments, we offer support:
 - On-site training
 - Security audits
 
-**[Become a Sponsor](https://github.com/sponsors/phillipmbanda)**
+**[Become a Sponsor](https://github.com/sponsors/Philba100)**
 
 ---
 
@@ -256,8 +256,8 @@ A: Yes! MIT License allows modifications. Just follow the contribution guideline
 A: Monthly updates with new features, bug fixes, and security patches.
 
 **Q: Is there a roadmap?**  
-A: Check [GitHub Discussions](https://github.com/phillipmbanda/agentboost/discussions) for planned features.
+A: Check [GitHub Discussions](https://github.com/Philba100/agentboost/discussions) for planned features.
 
 ---
 
-**Have another question?** [Contact us](mailto:phillipmbanda@gmail.com)
+**Have another question?** [Email us](mailto:phillipmbanda@gmail.com) or [follow on GitHub](https://github.com/Philba100/)

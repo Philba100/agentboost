@@ -241,7 +241,7 @@ For security issues:
 ## Questions?
 
 - 📧 Email: phillipmbanda@gmail.com
-- 💬 GitHub Discussions
+- 💬 [GitHub Discussions](https://github.com/Philba100/agentboost/discussions)
 - 🌐 Website: agentboost-seven.vercel.app
 
 ## Recognition

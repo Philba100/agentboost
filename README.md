@@ -500,7 +500,7 @@ This project is provided under the **MIT License**, which allows free usage and 
 | **Professional** | $50/mo | Email support, priority updates |
 | **Enterprise** | Custom | SLA, custom integrations, direct support |
 
-**[Become a Sponsor →](https://github.com/sponsors/phillipmbanda)**
+**[Become a Sponsor →](https://github.com/sponsors/Philba100)**
 
 ---
 
@@ -522,14 +522,14 @@ The above copyright notice and this permission notice shall be included in all c
 
 **Author**: Phillip Martin Banda  
 **Email**: [phillipmbanda@gmail.com](mailto:phillipmbanda@gmail.com)  
-**GitHub**: [@phillipmbanda](https://github.com/phillipmbanda)  
-**LinkedIn**: [linkedin.com/in/phillipmbanda](https://linkedin.com/in/phillipmbanda)
+**GitHub**: [@Philba100](https://github.com/Philba100/)  
+**LinkedIn**: [phillip-banda-4a95949a](https://www.linkedin.com/in/phillip-banda-4a95949a/)
 
 ### Support
 
 - 📧 **Email Support**: phillipmbanda@gmail.com
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/agentboost/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/agentboost/discussions)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/Philba100/agentboost/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/Philba100/agentboost/discussions)
 - 🌐 **Website**: [agentboost-seven.vercel.app](https://agentboost-seven.vercel.app)
 
 ---

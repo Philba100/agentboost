@@ -199,7 +199,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For upgrade guidance, see [SUPPORT.md](./SUPPORT.md)
 
-For details on all releases, see [GitHub Releases](https://github.com/phillipmbanda/agentboost/releases)
+For details on all releases, see [GitHub Releases](https://github.com/Philba100/agentboost/releases)
 
 ---
 
@@ -231,6 +231,8 @@ See [UPGRADE_GUIDE.md](./docs/UPGRADE_GUIDE.md) for detailed migration instructi
 
 **Created by**: Phillip Martin Banda  
 **Email**: phillipmbanda@gmail.com  
+**GitHub**: https://github.com/Philba100/  
+**LinkedIn**: https://www.linkedin.com/in/phillip-banda-4a95949a/  
 **License**: MIT
 
 Thank you to all contributors and sponsors who make AgentBoost possible! 🙏

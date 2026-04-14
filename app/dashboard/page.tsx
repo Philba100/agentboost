@@ -64,6 +64,13 @@ function DashboardContent() {
     fetchData();
   }, []);
 
+  // Ensure a skill is selected if none is selected
+  useEffect(() => {
+    if (!selectedSkill && skills.length > 0) {
+      setSelectedSkill(skills[0]);
+    }
+  }, [selectedSkill, skills.length]);
+
   const generateKey = async () => {
     const { data } = await supabase.from('api_keys').insert([{ user_id: user.id }]).select();
     if (data) setKeys([...keys, ...data]);

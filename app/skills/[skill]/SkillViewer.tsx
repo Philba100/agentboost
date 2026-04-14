@@ -11,6 +11,7 @@ interface SkillDetail {
   desc: string;
   benefits: string[];
   category?: string;
+  free?: boolean;
 }
 
 export default function SkillViewer({ skillId, keyParam }: { skillId: string; keyParam?: string }) {
@@ -20,7 +21,25 @@ export default function SkillViewer({ skillId, keyParam }: { skillId: string; ke
   const [validating, setValidating] = useState(!!keyParam);
   const [keyValid, setKeyValid] = useState(!keyParam);
   
-  const skill = skills.find(s => s.id === skillId) as SkillDetail | undefined;
+  // Find the skill - with safety checks
+  let skill: SkillDetail | undefined;
+  try {
+    skill = skills.find(s => s?.id === skillId) as SkillDetail | undefined;
+  } catch (e) {
+    console.error('Error finding skill:', e);
+  }
+
+  if (!skill) {
+    return (
+      <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-8 text-center">
+        <p className="text-red-400 font-semibold mb-2 text-lg">Skill Not Found</p>
+        <p className="text-slate-300 mb-4">Could not find skill "{skillId}"</p>
+        <a href="/dashboard" className="inline-block px-6 py-2 bg-[#00ff9d] text-[#0f172a] rounded font-semibold hover:bg-emerald-400 transition-all">
+          Go to Dashboard
+        </a>
+      </div>
+    );
+  }
 
   // Validate key if provided in URL
   useEffect(() => {
@@ -86,7 +105,7 @@ export default function SkillViewer({ skillId, keyParam }: { skillId: string; ke
 
   return (
     <div className="space-y-8">
-      {/* Validation State */}
+      {/* Show loading state only if actively validating */}
       {validating && (
         <div className="bg-[#1e293b] border border-slate-700 rounded-lg p-8 text-center">
           <div className="w-8 h-8 border-2 border-[#00ff9d] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -94,6 +113,7 @@ export default function SkillViewer({ skillId, keyParam }: { skillId: string; ke
         </div>
       )}
 
+      {/* Show access denied only if validation failed */}
       {!validating && !keyValid && (
         <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-8 text-center">
           <p className="text-red-400 font-semibold mb-2 text-lg">Access Denied</p>
@@ -104,7 +124,8 @@ export default function SkillViewer({ skillId, keyParam }: { skillId: string; ke
         </div>
       )}
 
-      {!validating && keyValid && (
+      {/* Show content when access is valid */}
+      {keyValid && (
         <>
       {skill && (
         <div className="bg-gradient-to-r from-[#1e293b] to-[#0f172a] border border-slate-700 rounded-lg p-8">

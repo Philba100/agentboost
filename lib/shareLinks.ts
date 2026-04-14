@@ -39,14 +39,13 @@ export async function createShareLink(
     // Insert share link into database
     const { data, error } = await supabaseAdmin
       .from('share_links')
-      .insert({
+      .insert([{
         share_id: shareId,
         skill_id: skillId,
         user_id: userId,
         expires_at: expiresAt,
         view_count: 0,
-        created_at: new Date().toISOString(),
-      })
+      }])
       .select('share_id')
       .single();
 

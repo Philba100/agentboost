@@ -16,6 +16,8 @@ function DashboardContent() {
   const [loading, setLoading] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
   const [selectedSkill, setSelectedSkill] = useState<any>(null);
+  const [shareLink, setShareLink] = useState<string>('');
+  const [generatingLink, setGeneratingLink] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -64,12 +66,52 @@ function DashboardContent() {
     fetchData();
   }, []);
 
-  // Ensure a skill is selected if none is selected
+  // Generate unique share link when skill changes
   useEffect(() => {
-    if (!selectedSkill && skills.length > 0) {
-      setSelectedSkill(skills[0]);
-    }
-  }, [selectedSkill, skills.length]);
+    const generateShareLink = async () => {
+      if (!selectedSkill || !user) {
+        setShareLink('');
+        return;
+      }
+
+      setGeneratingLink(true);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          console.error('No session token available');
+          setShareLink('');
+          return;
+        }
+
+        const response = await fetch('/api/generate-share-link', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            skillId: selectedSkill.id,
+            expiresInDays: 365, // 1 year
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setShareLink(data.shareUrl);
+        } else {
+          console.error('Failed to generate share link:', response.statusText);
+          setShareLink('');
+        }
+      } catch (error) {
+        console.error('Error generating share link:', error);
+        setShareLink('');
+      } finally {
+        setGeneratingLink(false);
+      }
+    };
+
+    generateShareLink();
+  }, [selectedSkill, user]);
 
   const generateKey = async () => {
     const { data } = await supabase.from('api_keys').insert([{ user_id: user.id }]).select();
@@ -454,31 +496,41 @@ function DashboardContent() {
               </div>
 
               <div className="bg-[#0f172a] border border-slate-700 rounded-lg p-6">
-                <h4 className="font-semibold text-white mb-3">🔗 Share Link</h4>
-                <p className="text-slate-400 text-sm mb-4">Share this skill with team members:</p>
-                <div className="flex flex-col gap-2">
-                  <input 
-                    type="text" 
-                    value={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?key=${keys[0]?.key_secret?.substring(0, 14)}`}
-                    readOnly
-                    className="w-full px-3 py-2 bg-[#0b1220] border border-slate-600 rounded text-slate-300 text-xs font-mono"
-                  />
-                  <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText(`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?key=${keys[0]?.key_secret?.substring(0, 14)}`);
-                      alert('Link copied to clipboard!');
-                    }}
-                    className="px-4 py-2 bg-slate-700 text-white rounded font-semibold text-sm hover:bg-slate-600 transition-all"
-                  >
-                    Copy Link
-                  </button>
-                </div>
+                <h4 className="font-semibold text-white mb-3">🔗 Unique Share Link</h4>
+                <p className="text-slate-400 text-sm mb-4">Share this skill with team members (unique for each skill):</p>
+                {generatingLink ? (
+                  <div className="w-full px-4 py-2 bg-slate-700 text-slate-400 rounded text-sm text-center">
+                    Generating link...
+                  </div>
+                ) : shareLink ? (
+                  <div className="flex flex-col gap-2">
+                    <input 
+                      type="text" 
+                      value={shareLink}
+                      readOnly
+                      className="w-full px-3 py-2 bg-[#0b1220] border border-slate-600 rounded text-slate-300 text-xs font-mono"
+                    />
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(shareLink);
+                        alert('Link copied to clipboard!');
+                      }}
+                      className="px-4 py-2 bg-slate-700 text-white rounded font-semibold text-sm hover:bg-slate-600 transition-all"
+                    >
+                      Copy Link
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-full px-4 py-2 bg-red-700/20 border border-red-600 text-red-400 rounded text-sm">
+                    Failed to generate share link
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="mt-6 bg-[#0f172a] border-l-4 border-[#00ff9d] rounded-lg p-4">
               <p className="text-slate-300 text-sm">
-                <strong>💡 Tip:</strong> Links are secured with your API key prefix. Share them with your team - valid subscribers can access this skill.
+                <strong>💡 Tip:</strong> Each skill gets a unique shareable link. Recipients can access the skill without needing their own account or API key.
               </p>
             </div>
           </div>

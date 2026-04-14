@@ -269,20 +269,21 @@ function DashboardContent() {
             <p className="text-xs text-slate-400 mb-4">{freeSkills.length} free • {paidSkills.length} premium</p>
             <div className="space-y-2 max-h-[600px] overflow-y-auto">
               {skills.map((skill) => {
-                const isFreeSkill = skill.free === true;
-                const canAccess = isFreeSkill || isEnterprise || (isPro && skill.free !== true);
+                const isFreeSkill = skill?.free === true;
+                const canAccess = isFreeSkill || isEnterprise;
+                const canSelect = isFreeSkill || (isPro && !isFreeSkill) || isEnterprise;
                 
                 return (
                 <button
                   key={skill.id}
                   onClick={() => setSelectedSkill(skill)}
-                  disabled={!canAccess && isFree}
+                  disabled={isFree && !isFreeSkill}
                   className={`w-full text-left p-4 rounded-lg border transition-all ${
                     selectedSkill?.id === skill.id
                       ? 'bg-[#00ff9d] border-[#00ff9d] text-[#0f172a] font-semibold'
                       : isFreeSkill
                       ? 'bg-[#1e293b] border-slate-700 text-slate-200 hover:border-slate-600'
-                      : isEnterprise || (isPro && skill.free !== true)
+                      : isEnterprise
                       ? 'bg-[#1e293b] border-blue-700/50 text-slate-200 hover:border-blue-600'
                       : 'bg-[#0f172a] border-slate-800 text-slate-400 opacity-60 cursor-not-allowed'
                   }`}
@@ -295,11 +296,13 @@ function DashboardContent() {
                     <span className={`text-[10px] font-bold px-2 py-1 rounded whitespace-nowrap ${
                       isFreeSkill
                         ? 'bg-green-600/20 text-green-400'
-                        : isEnterprise || (isPro && skill.free !== true)
+                        : isEnterprise
+                        ? 'bg-blue-600/20 text-blue-400'
+                        : isPro && !isFreeSkill
                         ? 'bg-blue-600/20 text-blue-400'
                         : 'bg-slate-600/20 text-slate-400'
                     }`}>
-                      {isFreeSkill ? 'FREE' : isEnterprise ? 'ALL' : isPro ? 'PRO' : 'LOCKED'}
+                      {isFreeSkill ? 'FREE' : isEnterprise ? 'ALL' : 'LOCKED'}
                     </span>
                   </div>
                   <p className={`text-xs ${selectedSkill?.id === skill.id ? 'text-[#0f172a]/70' : 'text-slate-400'}`}>

@@ -1,6 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
-import skills from '@/app/lib/skillsData';
+
+let skills: any[] = [];
+try {
+  const skillsModule = require('@/app/lib/skillsData');
+  skills = skillsModule.default || [];
+} catch (e) {
+  console.error('Error loading skills:', e);
+}
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,10 +25,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Find the skill
-    const skill = skills.find(s => s.id === skillId);
+    const skill = skillId ? skills.find((s: any) => s.id === skillId) : null;
     
     // RULE 1: Free skills always accessible
-    if (skill && skill.free) {
+    if (skill && skill.free === true) {
       return NextResponse.json({ 
         valid: true,
         type: 'free-skill',
@@ -41,7 +48,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Find key matching the prefix
-    const matchingKey = apiKeys.find(k => k.key_secret?.startsWith(keyPrefix));
+    const matchingKey = apiKeys.find((k: any) => k.key_secret?.startsWith(keyPrefix));
     
     if (!matchingKey) {
       return NextResponse.json({ valid: false, error: 'Invalid key' }, { status: 401 });

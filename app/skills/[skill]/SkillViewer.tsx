@@ -55,10 +55,13 @@ export default function SkillViewer({ skillId, keyParam }: { skillId: string; ke
     if (!keyValid) return;
     
     let mounted = true;
+    setErr(null);
+    setMd(null);
+    
     fetch(`/api/skill-md?id=${encodeURIComponent(skillId)}`)
       .then((r) => {
         if (!r.ok) {
-          throw new Error(`HTTP ${r.status}`);
+          throw new Error(`HTTP ${r.status}: ${r.statusText}`);
         }
         return r.json();
       })
@@ -68,13 +71,14 @@ export default function SkillViewer({ skillId, keyParam }: { skillId: string; ke
           setMd(data.content);
           setErr(null);
         } else if (data.error) {
-          setErr(`File error: ${data.error}`);
+          setErr(`Unable to load: ${data.error}`);
         } else {
-          setErr('SKILL.md not found');
+          setErr('Skill documentation not available');
         }
       })
       .catch((err) => {
         if (!mounted) return;
+        console.error('Markdown fetch error:', err);
         setErr(`Failed to load documentation: ${err.message}`);
       });
     return () => { mounted = false; };

@@ -602,10 +602,156 @@ function DashboardContent() {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-[#0f172a] border border-slate-700 rounded-lg p-6">
                 <h4 className="font-semibold text-white mb-3">📲 Quick Access Link</h4>
-                <p className="text-slate-400 text-sm mb-4">Open this skill on any mobile device:</p>
-                <a href={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?key=${keys[0]?.key_secret?.substring(0, 14)}`} target="_blank" rel="noreferrer" className="block w-full px-4 py-3 bg-[#00ff9d] text-[#0f172a] rounded font-semibold text-sm text-center hover:bg-emerald-400 transition-all">
+                <a href={`https://agentboost-seven.vercel.app/skills/${selectedSkill.id}?key=${keys[0]?.key_secret?.substring(0, 14)}`} target="_blank" rel="noreferrer" className="block w-full px-4 py-3 bg-[#00ff9d] text-[#0f172a] rounded font-semibold text-sm text-center hover:bg-emerald-400 transition-all mb-4">
                   Open {selectedSkill.name} on Mobile
                 </a>
+                
+                <div className="space-y-3">
+                  <p className="text-slate-400 text-xs uppercase font-semibold tracking-wider">Try these prompts:</p>
+                  {selectedSkill.id === 'analytics-hub' && (
+                    <>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📊 "What's our pipeline performance this quarter?"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📈 "Show me my top performing campaigns by ROI"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">🎯 "Forecast revenue for the next 90 days"</p>
+                      </div>
+                    </>
+                  )}
+                  {selectedSkill.id === 'lead-qualifier' && (
+                    <>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">🎯 "Score this lead: VP Sales at TechCorp, $100k budget, Q2 timeline"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">✅ "Which of these 5 prospects has the highest qualification score?"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📋 "Make a recommendation for next steps on this prospect"</p>
+                      </div>
+                    </>
+                  )}
+                  {selectedSkill.id === 'contract-draft-assistant' && (
+                    <>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📜 "Draft an NDA between our company and Acme Corp"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">⚖️ "What are the risks in this contract clause?"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">✏️ "Generate a counter-offer for better payment terms"</p>
+                      </div>
+                    </>
+                  )}
+                  {selectedSkill.id === 'negotiation-engine' && (
+                    <>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">🤝 "What's the best counter-offer to $50k annually?"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">💬 "How should I respond to 'I need a 30% discount'?"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📊 "What's the ROI impact of extending the contract 2 years?"</p>
+                      </div>
+                    </>
+                  )}
+                  {selectedSkill.id === 'meeting-scheduler' && (
+                    <>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📅 "Schedule a 1hr meeting for me, Sarah, and Mike this week"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">🔗 "Sync my calendar with Google Calendar"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📬 "Send a reminder 15 minutes before my next meeting"</p>
+                      </div>
+                    </>
+                  )}
+                  {selectedSkill.id === 'email-orchestrator' && (
+                    <>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">✉️ "Create a 5-step nurture sequence for warm leads"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">🎯 "Generate 3 subject line variations for A/B testing"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📊 "What's my best performing email template?"</p>
+                      </div>
+                    </>
+                  )}
+                  {selectedSkill.id === 'crm-sync' && (
+                    <>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">🔗 "Connect my Salesforce account to sync all contacts"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">🔄 "Sync new lead scores from Analytics Hub to HubSpot"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📋 "What data conflicts need resolution in my CRM?"</p>
+                      </div>
+                    </>
+                  )}
+                  {selectedSkill.id === 'linkedin-pro' && (
+                    <>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📝 "Write a viral LinkedIn post about AI trends"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">🎯 "Create 3 hook variations for tech audience"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">⏰ "When should I post for maximum engagement?"</p>
+                      </div>
+                    </>
+                  )}
+                  {selectedSkill.id === 'aws-cost' && (
+                    <>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">☁️ "Scan my AWS account for idle resources"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">💰 "Estimate my monthly savings with recommended changes"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📊 "Show me my top cost-saving opportunities"</p>
+                      </div>
+                    </>
+                  )}
+                  {selectedSkill.id === 'seo-audit' && (
+                    <>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">🚀 "Audit our website for technical SEO issues"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📈 "Check our Core Web Vitals score"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">🔍 "What meta tags are missing from our pages?"</p>
+                      </div>
+                    </>
+                  )}
+                  {!['analytics-hub', 'lead-qualifier', 'contract-draft-assistant', 'negotiation-engine', 'meeting-scheduler', 'email-orchestrator', 'crm-sync', 'linkedin-pro', 'aws-cost', 'seo-audit'].includes(selectedSkill.id) && (
+                    <>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">💡 "Help me with {selectedSkill.name.toLowerCase()}"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">🎯 "What are the key features of this skill?"</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded p-3 border border-slate-700 hover:border-slate-600 transition cursor-pointer">
+                        <p className="text-slate-300 text-xs">📖 "Show me an example of how to use {selectedSkill.name.toLowerCase()}"</p>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="bg-[#0f172a] border border-slate-700 rounded-lg p-6">

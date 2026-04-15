@@ -114,19 +114,22 @@ All 31+ AgentBoost skills are available directly in **Google AI Edge Gallery** �
 
 ### Quick Start
 
-1. Download **Google AI Edge Gallery** from [Google Play](https://play.google.com/store/apps/details?id=com.google.ai.edge.gallery) or [App Store](https://apps.apple.com/us/app/google-ai-edge-gallery/id6749645337)
-2. Search for an AgentBoost skill (e.g., "Lead Qualifier", "Contract Draft Assistant")
-3. Tap the skill to open it with Gemma 4 model
-4. Use naturally — the skill handles everything
+1. Go to **AgentBoost Dashboard** — Sign in at https://agentboost-seven.vercel.app/dashboard
+2. Select a skill and find the **"Access on Mobile & Edge Gallery"** section
+3. Copy the **Unique Share Link** (e.g., `https://agentboost-seven.vercel.app/share/{uuid}`)
+4. Download **Google AI Edge Gallery** from [Google Play](https://play.google.com/store/apps/details?id=com.google.ai.edge.gallery) or [App Store](https://apps.apple.com/us/app/google-ai-edge-gallery/id6749645337)
+5. In the app, tap **Ask Image** → Select **AI Chat** → Tap **Skills icon** (puzzle piece) → **"Load skill from URL"**
+6. **Paste your AgentBoost share link** and tap "Add Skill"
+7. **Use naturally** — The skill is now available with Gemma 4 LiteRT-LM
 
 **📚 Full Setup Guide:** See [Google AI Edge Gallery Wiki](https://github.com/google-ai-edge/gallery/wiki) for detailed instructions, system requirements, and troubleshooting.
 
 ### Device Requirements
 
-- **iOS 14+** with Safari, Chrome, or Edge
-- **Android 8+** with Chrome or Firefox  
+- **iOS 17+** with Google AI Edge Gallery app
+- **Android 12+** with Google AI Edge Gallery app
 - **LiteRT-LM Support** for on-device inference
-- Free or paid subscription access levels apply
+- Free or paid subscription access levels apply (based on AgentBoost tier)
 
 ---
 
@@ -277,10 +280,10 @@ npm run lint
 - **Markdown** → `skills/{skill-id}/SKILL.md`
 
 **On Mobile via Google AI Edge Gallery:**
-- Download app: [Google Play](https://play.google.com/store/apps/details?id=com.google.ai.edge.gallery) or [App Store](https://apps.apple.com/us/app/google-ai-edge-gallery/id6749645337)
-- Search for the skill by name
-- Tap to use with Gemma 4 LiteRT-LM foundation model
-- Process happens on-device, no cloud upload required
+- Get a **Unique Share Link** from AgentBoost Dashboard (each skill has one under "Access on Mobile & Edge Gallery")
+- Open Edge Gallery app and go to AI Chat → Skills icon (puzzle piece) → "Load skill from URL"
+- Paste the AgentBoost share link and tap "Add Skill"
+- The skill downloads and runs on-device with Gemma 4 LiteRT-LM
 - Works offline after initial download
 - Full instructions: [Google AI Edge Gallery Wiki](https://github.com/google-ai-edge/gallery/wiki)
 

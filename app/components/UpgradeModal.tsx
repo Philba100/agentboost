@@ -20,9 +20,8 @@ export default function UpgradeModal({ open, onClose, skill }: Props) {
     } catch (e) {
       // swallow tracking errors
     }
-    // Redirect to login with the skill ID in next parameter
-    const skillPath = skill?.id ? `/skills/${skill.id}` : '/dashboard';
-    window.location.href = `/login?next=${encodeURIComponent(skillPath)}`;
+    // Redirect to login, then to dashboard to access API licensing
+    window.location.href = `/login?next=${encodeURIComponent('/dashboard')}`;
   };
 
   return (

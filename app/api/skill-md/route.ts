@@ -38,18 +38,21 @@ export async function GET(request: Request) {
       skillId = shareLink.skill_id;
       
       // Increment view count
-      const { data: currentLink } = await supabaseAdmin
-        .from('share_links')
-        .select('view_count')
-        .eq('share_id', id)
-        .single();
-      
-      if (currentLink) {
-        await supabaseAdmin
+      try {
+        const { data: currentLink } = await supabaseAdmin
           .from('share_links')
-          .update({ view_count: (currentLink.view_count || 0) + 1 })
+          .select('view_count')
           .eq('share_id', id)
-          .catch(() => {}); // Silently fail if view count update fails
+          .single();
+        
+        if (currentLink) {
+          await supabaseAdmin
+            .from('share_links')
+            .update({ view_count: (currentLink.view_count || 0) + 1 })
+            .eq('share_id', id);
+        }
+      } catch {
+        // Silently fail if view count update fails
       }
     } catch (err) {
       console.error('Error resolving share_id:', err);

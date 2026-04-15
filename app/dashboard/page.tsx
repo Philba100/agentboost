@@ -21,6 +21,9 @@ function DashboardContent() {
   const [shareLink, setShareLink] = useState<string>('');
   const [generatingLink, setGeneratingLink] = useState(false);
   const [shareTableMissing, setShareTableMissing] = useState(false);
+  const [newKeyName, setNewKeyName] = useState<string>('');
+  const [showKeyNameInput, setShowKeyNameInput] = useState(false);
+  const [deletingKeyId, setDeletingKeyId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -129,8 +132,49 @@ function DashboardContent() {
   }, [selectedSkill, user]);
 
   const generateKey = async () => {
-    const { data } = await supabase.from('api_keys').insert([{ user_id: user.id }]).select();
-    if (data) setKeys([...keys, ...data]);
+    try {
+      const keyName = newKeyName.trim() || `Key ${new Date().toLocaleDateString()}`;
+      const { data, error } = await supabase
+        .from('api_keys')
+        .insert([{ user_id: user.id, name: keyName }])
+        .select();
+      
+      if (error) {
+        alert('Error generating key: ' + error.message);
+      } else if (data) {
+        setKeys([...keys, ...data]);
+        setNewKeyName('');
+        setShowKeyNameInput(false);
+      }
+    } catch (err) {
+      console.error('Error generating key:', err);
+      alert('Failed to generate key');
+    }
+  };
+
+  const deleteKey = async (keyId: string) => {
+    if (!confirm('Are you sure? This API key will no longer work.')) {
+      return;
+    }
+
+    try {
+      setDeletingKeyId(keyId);
+      const { error } = await supabase
+        .from('api_keys')
+        .delete()
+        .eq('id', keyId);
+      
+      if (error) {
+        alert('Error deleting key: ' + error.message);
+      } else {
+        setKeys(keys.filter(k => k.id !== keyId));
+      }
+    } catch (err) {
+      console.error('Error deleting key:', err);
+      alert('Failed to delete key');
+    } finally {
+      setDeletingKeyId(null);
+    }
   };
 
   const handleUpgradeEnterprise = async () => {
@@ -488,17 +532,62 @@ function DashboardContent() {
               <div className="space-y-3 mb-6">
                 <p className="text-xs uppercase text-slate-500 font-semibold tracking-wider mb-3">Active Keys ({keys.length})</p>
                 {keys.map(k => (
-                  <div key={k.id} className="bg-[#0f172a] p-4 rounded-lg font-mono text-xs border border-slate-700 flex justify-between items-center group">
-                    <span className="text-[#00ff9d] opacity-80 group-hover:opacity-100 transition break-all">{k.key_secret}</span>
-                    <span className="text-slate-400 uppercase text-[10px] bg-slate-800/50 px-2 py-1 rounded ml-2 shrink-0">{k.name}</span>
+                  <div key={k.id} className="bg-[#0f172a] p-4 rounded-lg border border-slate-700 flex items-center justify-between gap-4 group hover:border-slate-600 transition">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-slate-300 font-semibold text-sm mb-1 truncate">{k.name || 'Unnamed Key'}</p>
+                      <p className="text-[#00ff9d] opacity-70 group-hover:opacity-100 transition font-mono text-xs break-all">{k.key_secret}</p>
+                    </div>
+                    <button
+                      onClick={() => deleteKey(k.id)}
+                      disabled={deletingKeyId === k.id}
+                      className="shrink-0 px-3 py-2 bg-red-900/20 text-red-400 border border-red-800 rounded text-xs font-semibold hover:bg-red-900/40 transition disabled:opacity-50"
+                    >
+                      {deletingKeyId === k.id ? 'Deleting...' : 'Delete'}
+                    </button>
                   </div>
                 ))}
               </div>
             )}
             
-            <button onClick={generateKey} className="bg-[#00ff9d] text-[#0f172a] font-bold px-6 py-3 rounded-lg text-sm uppercase tracking-widest hover:bg-emerald-400 transition-all">
-              + Generate New Key
-            </button>
+            {showKeyNameInput ? (
+              <div className="bg-[#0f172a] border border-slate-700 rounded-lg p-4 mb-4 space-y-3">
+                <label className="block">
+                  <p className="text-slate-300 text-sm font-semibold mb-2">Key Name (e.g., Production API, Testing)</p>
+                  <input
+                    type="text"
+                    value={newKeyName}
+                    onChange={(e) => setNewKeyName(e.target.value)}
+                    placeholder="e.g., Production API, Staging, Development"
+                    className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded text-white placeholder-slate-500 focus:border-[#00ff9d] focus:outline-none"
+                    onKeyPress={(e) => e.key === 'Enter' && generateKey()}
+                  />
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={generateKey}
+                    className="flex-1 bg-[#00ff9d] text-[#0f172a] font-bold py-2 rounded-lg text-sm uppercase tracking-widest hover:bg-emerald-400 transition-all"
+                  >
+                    Generate Key
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowKeyNameInput(false);
+                      setNewKeyName('');
+                    }}
+                    className="px-4 py-2 bg-slate-800 text-slate-300 border border-slate-600 rounded-lg text-sm hover:bg-slate-700 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowKeyNameInput(true)}
+                className="bg-[#00ff9d] text-[#0f172a] font-bold px-6 py-3 rounded-lg text-sm uppercase tracking-widest hover:bg-emerald-400 transition-all"
+              >
+                + Generate New Key
+              </button>
+            )}
           </div>
         )}
 

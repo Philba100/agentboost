@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 import skills from '@/app/lib/skillsData';
@@ -10,6 +11,7 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env
 const API_ACCESS_PRICE_ID = process.env.NEXT_PUBLIC_API_ACCESS_PRICE_ID || ""; 
 
 function DashboardContent() {
+  const searchParams = useSearchParams();
   const [keys, setKeys] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -57,15 +59,19 @@ function DashboardContent() {
         const { data: k } = await supabase.from('api_keys').select('*').eq('user_id', session.user.id);
         setKeys(k || []);
 
-        // Set first skill as default
-        if (skills.length > 0) {
+        // Set skill from URL param, or default to first skill
+        const skillParam = searchParams.get('skill');
+        if (skillParam) {
+          const foundSkill = skills.find(s => s.id === skillParam);
+          setSelectedSkill(foundSkill || skills[0]);
+        } else if (skills.length > 0) {
           setSelectedSkill(skills[0]);
         }
       }
       setLoading(false);
     }
     fetchData();
-  }, []);
+  }, [searchParams]);
 
   // Generate unique share link when skill changes
   useEffect(() => {

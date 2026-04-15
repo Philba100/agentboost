@@ -46,7 +46,7 @@ export default function RegistryGrid({ skills }: { skills: any[] }) {
                 <div className="text-center w-full bg-slate-800 border border-slate-600 text-slate-300 px-5 py-3 rounded-lg font-medium text-[12px] hover:bg-slate-700 transition-all">
                   View Demo / SKILL.md
                 </div>
-                <Link href={`/login?next=/dashboard`} onClick={(e) => e.stopPropagation()} className="text-center w-full bg-transparent border border-slate-500 text-white px-5 py-3 rounded-lg font-medium text-[12px] hover:bg-[#00ff9d] hover:text-[#0f172a] hover:border-[#00ff9d] transition-all no-underline">
+                <Link href={`/login?next=/dashboard?skill=${skill.id}`} onClick={(e) => e.stopPropagation()} className="text-center w-full bg-transparent border border-slate-500 text-white px-5 py-3 rounded-lg font-medium text-[12px] hover:bg-[#00ff9d] hover:text-[#0f172a] hover:border-[#00ff9d] transition-all no-underline">
                   Provision License
                 </Link>
               </div>

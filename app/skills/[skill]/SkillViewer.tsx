@@ -269,66 +269,62 @@ export default function SkillViewer({ skillId, keyParam }: { skillId: string; ke
           {activeTab === 'mobile' && (
             <div className="bg-[#0b1220] border border-slate-800 rounded-lg p-6 space-y-6 text-slate-200">
               <div>
-                <h2 className="text-2xl font-bold text-white mb-3">Using on Mobile & Edge Gallery</h2>
-                <p className="text-slate-400 mb-6">Access and use {skill?.name} on mobile devices through the Edge Gallery:</p>
+                <h2 className="text-2xl font-bold text-white mb-3">Accessing on Mobile via Google AI Edge Gallery</h2>
+                <p className="text-slate-400 mb-6">Access {skill?.name} on mobile devices exclusively through Google AI Edge Gallery and related mobile applications:</p>
               </div>
 
               <div className="space-y-4">
                 <div className="bg-[#1e293b] border-l-4 border-[#00ff9d] p-4 rounded">
-                  <h4 className="font-bold text-white mb-2">📱 Mobile Access</h4>
+                  <h4 className="font-bold text-white mb-2">🛍️ Using Google AI Edge Gallery</h4>
                   <p className="text-slate-300 text-sm mb-3">
-                    Open your mobile browser and navigate to <code className="bg-[#0b1220] px-2 py-1 rounded text-[#e2e8f0]">agentboost-seven.vercel.app</code>. You'll automatically be redirected to the mobile-optimized version.
-                  </p>
-                  <ul className="text-slate-300 text-sm space-y-2 ml-4">
-                    <li>• iOS: Safari, Chrome, or any modern browser</li>
-                    <li>• Android: Chrome, Firefox, or any modern browser</li>
-                    <li>• Tablet: Full desktop experience available</li>
-                  </ul>
-                </div>
-
-                <div className="bg-[#1e293b] border-l-4 border-[#00ff9d] p-4 rounded">
-                  <h4 className="font-bold text-white mb-2">🛍️ Edge Gallery</h4>
-                  <p className="text-slate-300 text-sm mb-3">
-                    The Edge Gallery is a curated marketplace of AI agents and skills available on mobile:
+                    Google AI Edge Gallery is the official marketplace for accessing AgentBoost skills on mobile devices:
                   </p>
                   <ol className="text-slate-300 text-sm space-y-2 ml-4">
-                    <li>1. Open Edge Gallery from your mobile home screen</li>
-                    <li>2. Search for "{skill?.name}"</li>
-                    <li>3. Tap "Add to Home" to create a quick access shortcut</li>
-                    <li>4. Use the skill directly from the widget interface</li>
+                    <li>1. Open the <strong>Google AI Edge Gallery</strong> app on your mobile device (iOS or Android)</li>
+                    <li>2. Search for <strong>"{skill?.name}"</strong> or browse AgentBoost skills</li>
+                    <li>3. Tap the skill to open its full interface with LiteRT-LM Foundation Model (Gemma 4)</li>
+                    <li>4. Use the skill directly with native mobile optimizations</li>
                   </ol>
                 </div>
 
                 <div className="bg-[#1e293b] border-l-4 border-[#00ff9d] p-4 rounded">
-                  <h4 className="font-bold text-white mb-2">⚡ Quick Actions</h4>
+                  <h4 className="font-bold text-white mb-2">📦 Supported Devices</h4>
                   <p className="text-slate-300 text-sm mb-3">
-                    Set up quick action shortcuts on your mobile home screen:
+                    Supported on devices running modern versions of:
                   </p>
                   <ul className="text-slate-300 text-sm space-y-2 ml-4">
-                    <li>• Long-press the skill widget → "Add to Home Screen"</li>
-                    <li>• Create custom voice commands (iOS: Siri Shortcuts, Android: Google Assistant routines)</li>
-                    <li>• Share results via SMS, email, or messaging apps</li>
+                    <li>• <strong>iOS 14+:</strong> Via Google AI Edge Gallery</li>
+                    <li>• <strong>Android 8+:</strong> Via Google AI Edge Gallery</li>
+                    <li>• Requires LiteRT-LM for on-device inference</li>
                   </ul>
                 </div>
 
                 <div className="bg-[#1e293b] border-l-4 border-[#00ff9d] p-4 rounded">
-                  <h4 className="font-bold text-white mb-2">🔔 Notifications</h4>
-                  <p className="text-slate-300 text-sm">
-                    Enable push notifications to receive alerts when your skill tasks complete. Go to Settings → Notifications → {skill?.name} and toggle "Enable Alerts".
+                  <h4 className="font-bold text-white mb-2">✨ Edge Gallery Features</h4>
+                  <p className="text-slate-300 text-sm mb-3">
+                    Take advantage of Edge Gallery's capabilities:
                   </p>
+                  <ul className="text-slate-300 text-sm space-y-2 ml-4">
+                    <li>• <strong>On-device processing:</strong> Fast, private skill execution without cloud upload</li>
+                    <li>• <strong>Offline capable:</strong> Works without internet after initial setup</li>
+                    <li>• <strong>Touch-optimized interface:</strong> Designed specifically for mobile interaction</li>
+                    <li>• <strong>Quick access:</strong> Add skill shortcuts to your home screen</li>
+                    <li>• <strong>Share results:</strong> Export outputs to messaging apps, email, or notes</li>
+                  </ul>
                 </div>
 
                 <div className="bg-[#1e293b] border-l-4 border-[#00ff9d] p-4 rounded">
-                  <h4 className="font-bold text-white mb-2">📲 Responsive Design</h4>
-                  <p className="text-slate-300 text-sm">
-                    All features are optimized for touch input. Swipe to navigate, tap buttons for actions, and pinch to zoom for detailed views.
+                  <h4 className="font-bold text-white mb-2">🔗 Direct Access Link</h4>
+                  <p className="text-slate-300 text-sm mb-3">
+                    Search for this skill in Google AI Edge Gallery or use:
                   </p>
+                  <code className="bg-[#0b1220] px-3 py-2 rounded text-[#00ff9d] text-xs block break-all">{skill?.id}</code>
                 </div>
               </div>
 
               <div className="bg-[#1a4d2e] p-4 rounded border border-[#00ff9d]">
                 <p className="text-slate-200 text-sm">
-                  <strong>💡 Tip:</strong> For the best mobile experience, use the demo button below or save a bookmark to your home screen. Mobile web apps can work offline after the first load!
+                  <strong>💡 Tip:</strong> Download the Google AI Edge Gallery app to get the best mobile experience with full on-device processing and offline capability using LiteRT-LM.
                 </p>
               </div>
             </div>

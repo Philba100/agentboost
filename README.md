@@ -38,6 +38,7 @@ AgentBoost is a full-featured AI agent orchestration platform built with **Next.
 ✅ **Full Authentication System** — Email/password auth with Supabase  
 ✅ **Markdown Documentation** — Skill documentation with interactive tabs  
 ✅ **Enterprise Features** — Multi-agent workflows, CRM integration, real-time analytics  
+✅ **Mobile Access** — Run skills offline via Google AI Edge Gallery on iOS and Android  
 
 ---
 
@@ -48,7 +49,7 @@ AgentBoost is a full-featured AI agent orchestration platform built with **Next.
 - 📊 **Real-time Dashboard** with skill browsing and access controls
 - 🔐 **Subscription Tiers** — Free (5 skills), Pro (per-skill purchase), Enterprise (unlimited)
 - 🔑 **API Key Management** — Secure key generation and share links
-- 📱 **Mobile Responsive** — Full mobile support with optimized UI
+- 📱 **Google AI Edge Gallery** — Access skills on mobile via on-device AI processing with LiteRT-LM (Gemma 4)
 - 🌙 **Dark Theme** — Modern dark interface (#0f172a background)
 - 📚 **Interactive Documentation** — Tabbed interface with How-To guides
 
@@ -94,6 +95,38 @@ AgentBoost is a full-featured AI agent orchestration platform built with **Next.
 - SEO Audit Tool
 - RSS Aggregator
 - YouTube Predictor
+
+---
+
+## 📱 Google AI Edge Gallery Integration
+
+**Access AgentBoost Skills on Mobile with On-Device AI**
+
+All 31+ AgentBoost skills are available directly in **Google AI Edge Gallery** — the official marketplace for accessing AI agents on mobile devices.
+
+### Key Benefits
+
+✅ **On-Device Processing** — Skills run directly on your mobile device using Gemma 4 LiteRT-LM (no cloud upload)  
+✅ **100% Private** — All data stays on your device, no internet required after initial setup  
+✅ **Lightning Fast** — Sub-second responses with edge computing  
+✅ **Offline Capable** — Works without internet after downloading the skill  
+✅ **Native Mobile UX** — Touch-optimized interface for iOS and Android  
+
+### Quick Start
+
+1. Download **Google AI Edge Gallery** from [Google Play](https://play.google.com/store/apps/details?id=com.google.ai.edge.gallery) or [App Store](https://apps.apple.com/us/app/google-ai-edge-gallery/id6749645337)
+2. Search for an AgentBoost skill (e.g., "Lead Qualifier", "Contract Draft Assistant")
+3. Tap the skill to open it with Gemma 4 model
+4. Use naturally — the skill handles everything
+
+**📚 Full Setup Guide:** See [Google AI Edge Gallery Wiki](https://github.com/google-ai-edge/gallery/wiki) for detailed instructions, system requirements, and troubleshooting.
+
+### Device Requirements
+
+- **iOS 14+** with Safari, Chrome, or Edge
+- **Android 8+** with Chrome or Firefox  
+- **LiteRT-LM Support** for on-device inference
+- Free or paid subscription access levels apply
 
 ---
 
@@ -227,6 +260,7 @@ npm run lint
 - **[User Guide](./docs/user-guide.md)** — Dashboard, subscription management, API keys
 - **[Integration Guide](./docs/integration-guide.md)** — APIs, webhooks, OAuth
 - **[Skill Documentation](./docs/skills/)** — Individual skill guides and examples
+- **[Mobile Access via Google AI Edge Gallery](https://github.com/google-ai-edge/gallery/wiki)** — Official guide for using skills on mobile
 
 ### For Developers
 
@@ -235,12 +269,20 @@ npm run lint
 - **[Deployment Guide](./docs/deployment.md)** — Deploy to Vercel, Docker, AWS
 - **[Contributing Guide](./CONTRIBUTING.md)** — Code standards, pull requests
 
-### Skill-Specific Docs
+### Accessing Skills
 
-Each skill includes detailed documentation accessible via:
+**On Desktop/Web:**
 - **Dashboard** → Click skill → "View Skill Docs"
 - **Direct URL** → `/skills/{skill-id}/`
 - **Markdown** → `skills/{skill-id}/SKILL.md`
+
+**On Mobile via Google AI Edge Gallery:**
+- Download app: [Google Play](https://play.google.com/store/apps/details?id=com.google.ai.edge.gallery) or [App Store](https://apps.apple.com/us/app/google-ai-edge-gallery/id6749645337)
+- Search for the skill by name
+- Tap to use with Gemma 4 LiteRT-LM foundation model
+- Process happens on-device, no cloud upload required
+- Works offline after initial download
+- Full instructions: [Google AI Edge Gallery Wiki](https://github.com/google-ai-edge/gallery/wiki)
 
 ---
 
@@ -302,6 +344,57 @@ Body:
 POST /api/webhooks/stripe
 
 # Handles: customer.subscription.created, updated, deleted
+```
+
+#### Edge Gallery Endpoints (Google AI Edge Gallery Integration)
+
+**Get Skill Metadata**
+```
+GET /api/edge-gallery/skill-metadata?id={skillId}
+
+Response:
+{
+  "name": "Lead Qualifier",
+  "description": "...",
+  "category": "Sales",
+  "free": true,
+  "model": "Gemma 4 (LiteRT-LM)",
+  "examplePrompts": ["..."],
+  "expectedOutput": "..."
+}
+```
+
+**Get Skill Documentation (SKILL.md)**
+```
+GET /api/edge-gallery/skill-md?id={skillId}
+
+Response:
+Markdown file with full skill documentation, examples, and instructions
+```
+
+**List All Skills**
+```
+GET /api/edge-gallery/directory
+
+Response:
+{
+  "skills": [
+    {
+      "id": "skill-id",
+      "name": "Skill Name",
+      "category": "Category",
+      "free": true|false,
+      "icon": "🎯"
+    }
+  ]
+}
+```
+
+**Access Skill via Share Link**
+```
+GET /api/edge-gallery/share/{shareId}/{filename}
+
+# Serves skill documentation and resources for share-link access
 ```
 
 ### Rate Limiting

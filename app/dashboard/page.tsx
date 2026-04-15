@@ -237,6 +237,15 @@ function DashboardContent() {
   const freeSkills = skills.filter(s => s.free === true);
   const paidSkills = skills.filter(s => s.free !== true);
   
+  // Reorder skills: put selected skill first, then free skills, then paid skills
+  const orderedSkills = selectedSkill 
+    ? [
+        selectedSkill,
+        ...freeSkills.filter(s => s.id !== selectedSkill.id),
+        ...paidSkills.filter(s => s.id !== selectedSkill.id)
+      ]
+    : skills;
+  
   const isFree = profile?.subscription_tier === 'free';
   const isPro = profile?.subscription_tier === 'pro';
   const isEnterprise = profile?.subscription_tier === 'enterprise';
@@ -332,7 +341,7 @@ function DashboardContent() {
             <h3 className="text-lg font-bold text-white mb-2">Available Skills</h3>
             <p className="text-xs text-slate-400 mb-4">{freeSkills.length} free • {paidSkills.length} premium</p>
             <div className="space-y-2 max-h-[600px] overflow-y-auto">
-              {skills.map((skill) => {
+              {orderedSkills.map((skill) => {
                 const isFreeSkill = skill?.free === true;
                 const canAccess = isFreeSkill || isEnterprise;
                 const canSelect = isFreeSkill || (isPro && !isFreeSkill) || isEnterprise;

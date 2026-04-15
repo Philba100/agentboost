@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import skills from '@/app/lib/skillsData';
 
 /**
  * UNIFIED EXECUTION ENGINE
@@ -26,27 +27,58 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid API Key. Generate one at agentboost-seven.vercel.app/dashboard' }, { status: 401 });
     }
 
-    // 2. AUTHORIZATION: Check Subscription Status
+    // 2. AUTHORIZATION: Check Subscription Status & Skill Access
     const { data: profile, error: profError } = await supabaseAdmin
       .from('profiles')
       .select('subscription_tier')
       .eq('id', keyData.user_id)
       .single();
 
-    if (profError || profile?.subscription_tier !== 'pro') {
+    if (profError || !profile) {
       return NextResponse.json({ 
-        error: 'Pro Subscription Required. Upgrade your account on the AgentBoost website to use this tool.' 
-      }, { status: 402 });
+        error: 'User profile not found' 
+      }, { status: 401 });
     }
 
+    // Parse the skill ID from payload
+    const { skill: skillId, data: skillData } = await req.json();
+
+    if (!skillId) {
+      return NextResponse.json({ error: 'Missing skill parameter' }, { status: 400 });
+    }
+
+    // Find the skill definition to check if it's free
+    const skillDef = skills.find(s => s.id === skillId);
+    const isFreeSk = skillDef?.free === true;
+
+    // ACCESS CONTROL LOGIC:
+    // - Free users can only access free skills
+    // - Pro users can access free skills + paid skills
+    // - Enterprise users can access everything
+    if (profile.subscription_tier === 'free') {
+      if (!isFreeSk) {
+        return NextResponse.json({ 
+          error: 'This is a premium skill. Upgrade to Pro or Enterprise to access it.',
+          needsUpgrade: true
+        }, { status: 402 });
+      }
+    } else if (profile.subscription_tier === 'pro') {
+      // Pro users have access to all paid skills (no need to check specific purchases yet)
+      // They can access both free and paid skills
+    } else if (profile.subscription_tier !== 'enterprise') {
+      return NextResponse.json({ 
+        error: 'Invalid subscription tier. Please contact support.' 
+      }, { status: 403 });
+    }
+    // Enterprise users have access to everything (no additional checks needed)
+
     // 3. LOGIC ROUTING: Parse payload and execute skill
-    const { skill, data } = await req.json();
     let result = {};
 
-    switch (skill) {
+    switch (skillId) {
       case 'crypto':
         result = {
-          asset: data.asset || 'BTC',
+          asset: skillData.asset || 'BTC',
           strategy: "Iron Condor (Neutral)",
           iv_rank: "88th Percentile (High)",
           recommended_strikes: { 
@@ -59,12 +91,12 @@ export async function POST(req: Request) {
         break;
 
       case 'real-estate':
-        const purchasePrice = parseFloat(data.purchase_price) || 0;
-        const monthlyRent = parseFloat(data.estimated_rent) || 0;
+        const purchasePrice = parseFloat(skillData.purchase_price) || 0;
+        const monthlyRent = parseFloat(skillData.estimated_rent) || 0;
         const capRate = purchasePrice > 0 ? ((monthlyRent * 12) / purchasePrice * 100).toFixed(2) : "0.00";
         
         result = {
-          address: data.address,
+          address: skillData.address,
           metrics: {
             cap_rate: `${capRate}%`,
             annual_gross_income: (monthlyRent * 12).toLocaleString('en-US', { style: 'currency', currency: 'USD' }),
@@ -77,15 +109,15 @@ export async function POST(req: Request) {
 
       case 'b2b-leads':
         result = {
-          domain: data.domain,
-          requested_role: data.role,
+          domain: skillData.domain,
+          requested_role: skillData.role,
           verified_leads: [
             { 
               name: "J. Thompson", 
-              email: `j.thompson@${data.domain}`, 
-              title: data.role, 
+              email: `j.thompson@${skillData.domain}`, 
+              title: skillData.role, 
               confidence: "98%",
-              linkedin: `https://www.linkedin.com/sales/search/people?company=${data.domain}`
+              linkedin: `https://www.linkedin.com/sales/search/people?company=${skillData.domain}`
             }
           ],
           source: "AgentBoost Global Scraper V2"
@@ -94,8 +126,8 @@ export async function POST(req: Request) {
 
       case 'github-review':
         result = {
-          repo: data.repo_name,
-          pr: data.pr_number,
+          repo: skillData.repo_name,
+          pr: skillData.pr_number,
           security_audit: {
             critical_vulnerabilities: 1,
             warnings: 3,
@@ -104,13 +136,13 @@ export async function POST(req: Request) {
             ]
           },
           auto_fix_available: true,
-          fix_command: `npx agentboost-fix --repo ${data.repo_name} --pr ${data.pr_number}`
+          fix_command: `npx agentboost-fix --repo ${skillData.repo_name} --pr ${skillData.pr_number}`
         };
         break;
 
       case 'seo-audit':
         result = {
-          target: data.target_url,
+          target: skillData.target_url,
           health_score: 84,
           vitals: { LCP: "2.1s (Good)", CLS: "0.12 (Needs Improvement)" },
           top_recommendation: "Increase server response time and optimize hero image format to WebP.",
@@ -120,7 +152,7 @@ export async function POST(req: Request) {
 
       case 'yt-predictor':
         result = {
-          video_title: data.video_title,
+          video_title: skillData.video_title,
           predicted_ctr: "8.4%",
           engagement_rank: "Top 10% for Niche",
           heatmap_findings: "Primary focus point on Face. High contrast detected.",
@@ -130,13 +162,13 @@ export async function POST(req: Request) {
 
       case 'whatsapp':
         result = {
-          campaign: data.campaign_name,
-          audience_segment: data.audience,
+          campaign: skillData.campaign_name,
+          audience_segment: skillData.audience,
           delivery_status: "Validated & Prepared",
           metadata: {
-            scheduled_time: data.schedule_time || "Instant",
-            timezone: data.timezone || "Local Device",
-            msg_length: data.message?.length || 0
+            scheduled_time: skillData.schedule_time || "Instant",
+            timezone: skillData.timezone || "Local Device",
+            msg_length: skillData.message?.length || 0
           },
           action_required: "Approve broadcast on AgentBoost web dashboard."
         };
@@ -160,10 +192,10 @@ export async function POST(req: Request) {
     }
 
     // 4. LOG SUCCESS AND RETURN
-    console.log(`Executed skill: ${skill} for User: ${keyData.user_id}`);
+    console.log(`Executed skill: ${skillId} for User: ${keyData.user_id}`);
     return NextResponse.json({ 
       success: true, 
-      skill: skill,
+      skill: skillId,
       data: result 
     });
 

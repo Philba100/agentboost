@@ -26,9 +26,10 @@ export async function GET(request: NextRequest) {
 
     // Find the skill
     const skill = skillId ? skills.find((s: any) => s.id === skillId) : null;
+    const isFreeSk = skill?.free === true;
     
     // RULE 1: Free skills always accessible
-    if (skill && skill.free === true) {
+    if (isFreeSk) {
       return NextResponse.json({ 
         valid: true,
         type: 'free-skill',
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // RULE 2: For paid skills, check user's subscription
+    // For paid skills, check user's subscription
     // Find API key that starts with this prefix
     const { data: apiKeys, error: fetchError } = await supabase
       .from('api_keys')
@@ -65,7 +66,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ valid: false, error: 'User not found' }, { status: 401 });
     }
 
-    // RULE 3: Enterprise users have access to everything
+    // ACCESS CONTROL LOGIC:
+    // - Enterprise users have access to everything
     if (profile.subscription_tier === 'enterprise') {
       return NextResponse.json({ 
         valid: true,
@@ -74,19 +76,21 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // RULE 4: For Pro users, they can access skills they've purchased
-    // For now, we're restricting to only free skills and enterprise for paid skills
-    // In the future, check user_skills table for individual purchases
+    // - Pro users have access to all paid skills
     if (profile.subscription_tier === 'pro') {
-      // TODO: Check user_skills table for this specific skill_id
       return NextResponse.json({ 
-        valid: false, 
-        error: 'Upgrade required - this skill is not in your tier',
-        needsUpgrade: true
-      }, { status: 401 });
+        valid: true,
+        type: 'pro',
+        message: 'Pro tier - access to this paid skill'
+      });
     }
 
-    return NextResponse.json({ valid: false, error: 'Subscription verification failed' }, { status: 401 });
+    // - Free users can only access free skills (already handled above)
+    return NextResponse.json({ 
+      valid: false, 
+      error: 'Upgrade required - this is a premium skill',
+      needsUpgrade: true
+    }, { status: 402 });
   } catch (error) {
     console.error('Token validation error:', error);
     return NextResponse.json({ valid: false, error: 'Server error' }, { status: 500 });

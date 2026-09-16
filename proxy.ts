@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Since Middleware runs on the Edge, we use standard fetch for Supabase 
+// Since Proxy (formerly Middleware) runs on the Edge, we use standard fetch for Supabase
 // to avoid importing heavy Node.js libraries.
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const url = request.nextUrl.pathname;
 
   // 1. Only intercept requests that look like: /share/[share_id]/[filename]
@@ -54,9 +54,10 @@ export async function middleware(request: NextRequest) {
       // Example: rewrites /share/123/SKILL.md -> /skills/lead-qualifier/SKILL.md
       const actualSkillId = shareRecord.skill_id;
       
-      return NextResponse.rewrite(
-        new URL(`/skills/${actualSkillId}/${filePath}`, request.url)
-      );
+      const nextUrl = request.nextUrl.clone();
+      nextUrl.pathname = `/skills/${actualSkillId}/${filePath}`;
+
+      return NextResponse.rewrite(nextUrl);
 
     } catch (error) {
       console.error("Error fetching share link:", error);

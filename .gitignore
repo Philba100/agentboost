@@ -1,7 +1,10 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Rust / Tauri Build Artifacts (Prevents 500MB build upload)
+target/
+src-tauri/target/
+src-tauri/gen/
 
-# dependencies
-/node_modules
+# Dependencies
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -10,32 +13,34 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
+# Next.js Build Output & Cache
+.next/
+out/
+build/
+dist/
 /coverage
 
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
+# Environment Variables & Secrets (CRITICAL)
 .env*
+!.env.example
 
-# vercel
+# IDE & Editor metadata
+.idea/
+.vscode/
+
+# Python Cache & Exports
+__pycache__/
+*.pyc
+scratch/
+agentboost_full_source_export.txt
+*.log
+
+# Vercel & TypeScript
 .vercel
-
-# typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+*.pem

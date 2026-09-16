@@ -1,0 +1,25 @@
+[package]
+name = "agentboost"
+version = "0.1.0"
+description = "AgentBoost hybrid desktop application"
+authors = ["AgentBoost"]
+license = "MIT"
+repository = "https://github.com/yourusername/agentboost"
+edition = "2021"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(mobile)'] }
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2.11.5", features = ["tray-icon"] }
+tauri-plugin-shell = "2"
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+dirs = "5"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

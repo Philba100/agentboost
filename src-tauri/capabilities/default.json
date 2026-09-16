@@ -1,0 +1,11 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default permissions for AgentBoost desktop windows",
+  "windows": ["*"],
+  "permissions": [
+    "core:default",
+    "shell:default",
+    "shell:allow-open"
+  ]
+}

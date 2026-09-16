@@ -2,8 +2,9 @@ import SiteHeader from '../../components/SiteHeader';
 import SiteFooter from '../../components/SiteFooter';
 import Link from 'next/link';
 import SkillViewer from './SkillViewer';
+import skills from '@/app/lib/skillsData';
 
-type Props = { 
+type Props = {
   params: Promise<{ skill: string }>;
   searchParams: Promise<{ key?: string }>;
 };
@@ -11,26 +12,30 @@ type Props = {
 export default async function SkillPage({ params, searchParams }: Props) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
-  
+
   const skillId = resolvedParams.skill;
   const keyParam = resolvedSearchParams.key;
 
-  const displayName = skillId ? decodeURIComponent(skillId).replace(/-/g, ' ') : 'Skill';
+  const skill = skills.find((s) => s.id === skillId);
+  const displayName = skill ? skill.name : decodeURIComponent(skillId).replace(/-/g, ' ');
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-[#f8fafc] font-sans antialiased">
+    <div className="min-h-screen bg-[#070c14] text-[#f8fafc] font-sans antialiased selection:bg-[#00ff9d] selection:text-[#070c14]">
       <SiteHeader />
-      <main className="max-w-[1100px] mx-auto px-6 md:px-12 py-24">
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold mb-4">{displayName}</h1>
-          <div className="flex gap-3">
-            <Link href={`/skills/${skillId}/demo`} className="px-4 py-2 bg-slate-800 border border-slate-700 rounded text-sm hover:bg-slate-700 transition">Open Demo</Link>
-            <Link href="/dashboard" className="px-4 py-2 bg-slate-800 border border-slate-700 rounded text-sm hover:bg-slate-700 transition">← Back to Dashboard</Link>
-          </div>
-        </div>
+
+      <main className="max-w-[1240px] mx-auto px-6 md:px-12 py-12">
+        {/* Navigation Breadcrumb */}
+        <nav className="flex items-center gap-2 text-xs font-mono text-slate-500 mb-8">
+          <Link href="/" className="hover:text-white transition">Home</Link>
+          <span>/</span>
+          <Link href="/#test-online" className="hover:text-white transition">Skills</Link>
+          <span>/</span>
+          <span className="text-[#00ff9d]">{displayName}</span>
+        </nav>
 
         <SkillViewer skillId={skillId} keyParam={keyParam} />
       </main>
+
       <SiteFooter />
     </div>
   );

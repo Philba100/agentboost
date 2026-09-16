@@ -3,6 +3,12 @@
   "identifier": "default",
   "description": "Default permissions for AgentBoost desktop windows",
   "windows": ["*"],
+  "remote": {
+    "urls": [
+      "https://agentboost-seven.vercel.app",
+      "https://agentboost-seven.vercel.app/*"
+    ]
+  },
   "permissions": [
     "core:default",
     "shell:default",

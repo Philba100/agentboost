@@ -5,15 +5,17 @@
   "identifier": "com.agentboost.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build",
+    "beforeBuildCommand": "",
     "devUrl": "http://localhost:3000",
-    "frontendDist": "../.next"
+    "frontendDist": "https://agentboost-seven.vercel.app"
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "label": "main",
-        "title": "AgentBoost",
+        "title": "AgentBoost Workstation",
+        "url": "/desktop",
         "width": 1400,
         "height": 900,
         "resizable": true,

@@ -8,10 +8,12 @@ import RegistryGrid from './components/RegistryGrid';
 import skills from './lib/skillsData';
 import { isTauri } from '@/lib/tauri';
 
+const MSI_INSTALLER_URL =
+  'https://lewgsyjntzsqfxdtkcin.supabase.co/storage/v1/object/public/installers/AgentBoost_0.1.0_x64_en-US.msi';
+
 export default function Home() {
   const router = useRouter();
   const [copied, setCopied] = useState(false);
-  const [detectedOs, setDetectedOs] = useState<'windows' | 'mac' | 'linux'>('windows');
 
   useEffect(() => {
     isTauri().then((inTauri) => {
@@ -19,18 +21,7 @@ export default function Home() {
         router.replace('/desktop');
       }
     });
-
-    if (typeof window !== 'undefined') {
-      const ua = window.navigator.userAgent.toLowerCase();
-      if (ua.includes('mac')) setDetectedOs('mac');
-      else if (ua.includes('linux')) setDetectedOs('linux');
-      else setDetectedOs('windows');
-    }
   }, [router]);
-
-  const handleDownloadDesktop = () => {
-    window.location.href = `/api/download/desktop?platform=${detectedOs}`;
-  };
 
   const codeSnippet = `import agentboost as ab
 
@@ -61,11 +52,11 @@ except ab.errors.ContextLimitExceeded:
 
       {/* Balanced 2-Column Hero */}
       <header className="relative max-w-[1400px] mx-auto pt-20 pb-28 px-6 md:px-12 grid lg:grid-cols-2 gap-16 items-center">
-        {/* Soft Ambient Depth Glows */}
+        {/* Ambient Depth Glows */}
         <div className="absolute top-1/4 left-1/4 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-500/10 blur-[150px] rounded-full -z-10 pointer-events-none"></div>
         <div className="absolute top-1/2 right-1/4 w-[500px] h-[500px] bg-[#00ff9d]/5 blur-[120px] rounded-full -z-10 pointer-events-none"></div>
 
-        {/* Left Column: Typography & Actions */}
+        {/* Left Column: Typography & Direct Action Buttons */}
         <div className="max-w-2xl relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#00ff9d]/30 bg-[#00ff9d]/10 text-[11px] font-bold uppercase tracking-widest text-[#00ff9d] mb-8">
             <span className="relative flex h-1.5 w-1.5">
@@ -96,12 +87,14 @@ except ab.errors.ContextLimitExceeded:
               Explore Registry <span aria-hidden="true">→</span>
             </a>
 
-            <button
-              onClick={handleDownloadDesktop}
+            {/* Direct MSI Installer Download */}
+            <a
+              href={MSI_INSTALLER_URL}
+              download="AgentBoost_0.1.0_x64_en-US.msi"
               className="flex items-center gap-2 rounded-lg border border-slate-700 bg-[#1e293b] px-6 py-4 text-sm font-mono text-slate-300 transition-colors hover:border-slate-500 hover:text-white cursor-pointer"
             >
-              <span className="text-[#00ff9d]">💻</span> download_desktop
-            </button>
+              <span className="text-[#00ff9d]">💻</span> download_desktop (.msi)
+            </a>
           </div>
         </div>
 
@@ -175,7 +168,7 @@ except ab.errors.ContextLimitExceeded:
         <RegistryGrid skills={skills} />
       </section>
 
-      {/* Network Telemetry / Stats */}
+      {/* Telemetry Stats */}
       <section className="relative border-y border-slate-800 bg-[#0f172a] py-24 overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
         <div className="relative z-10 max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-left">

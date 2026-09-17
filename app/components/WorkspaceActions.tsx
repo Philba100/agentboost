@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+const MSI_DOWNLOAD_URL =
+  'https://lewgsyjntzsqfxdtkcin.supabase.co/storage/v1/object/public/installers/AgentBoost_0.1.0_x64_en-US.msi';
+
 export default function WorkspaceActions() {
   const [busyAction, setBusyAction] = useState<'launch' | 'download' | null>(null);
   const router = useRouter();
@@ -36,10 +39,11 @@ export default function WorkspaceActions() {
       </button>
 
       <a
-        href="/api/download/desktop?platform=windows"
+        href={MSI_DOWNLOAD_URL}
+        download="AgentBoost_0.1.0_x64_en-US.msi"
         className="flex items-center gap-3 px-6 py-4 text-slate-300 font-mono text-[13px] border border-slate-700 rounded-md bg-slate-800/50 backdrop-blur-sm hover:border-slate-500 transition-colors justify-center cursor-pointer"
       >
-        <span className="text-[#00ff9d]">$</span> download_desktop --native
+        <span className="text-[#00ff9d]">$</span> download_desktop --msi
       </a>
     </div>
   );

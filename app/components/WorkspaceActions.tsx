@@ -36,10 +36,8 @@ export default function WorkspaceActions() {
       </button>
 
       <a
-        href="https://github.com/Philba100/agentboost/releases/latest"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-3 px-6 py-4 text-slate-300 font-mono text-[13px] border border-slate-700 rounded-md bg-slate-800/50 backdrop-blur-sm hover:border-slate-500 transition-colors justify-center"
+        href="/api/download/desktop?platform=windows"
+        className="flex items-center gap-3 px-6 py-4 text-slate-300 font-mono text-[13px] border border-slate-700 rounded-md bg-slate-800/50 backdrop-blur-sm hover:border-slate-500 transition-colors justify-center cursor-pointer"
       >
         <span className="text-[#00ff9d]">$</span> download_desktop --native
       </a>

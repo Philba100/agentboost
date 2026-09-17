@@ -95,6 +95,47 @@ async fn download_desktop_agent<R: Runtime>(
     Ok(output_path.to_string_lossy().to_string())
 }
 
+#[tauri::command]
+async fn install_desktop_update<R: Runtime>(
+    _app: tauri::AppHandle<R>,
+    download_url: String,
+) -> Result<String, String> {
+    let temp_dir = std::env::temp_dir();
+    let is_msi = download_url.to_lowercase().ends_with(".msi");
+    let file_name = if is_msi {
+        "AgentBoost_Update.msi"
+    } else {
+        "AgentBoost_Update.exe"
+    };
+
+    let target_file = temp_dir.join(file_name);
+    let target_str = target_file.to_string_lossy().to_string();
+
+    // 1. Download installer file directly using native curl
+    let status = std::process::Command::new("curl.exe")
+        .args(["-L", "-s", "-o", &target_str, &download_url])
+        .status()
+        .map_err(|e| format!("Failed to invoke system downloader: {}", e))?;
+
+    if !status.success() {
+        return Err("Update download failed. Please check network connection.".to_string());
+    }
+
+    // 2. Launch the downloaded installer
+    if is_msi {
+        std::process::Command::new("msiexec.exe")
+            .args(["/i", &target_str])
+            .spawn()
+            .map_err(|e| format!("Failed to launch MSI installer: {}", e))?;
+    } else {
+        std::process::Command::new(&target_str)
+            .spawn()
+            .map_err(|e| format!("Failed to launch update installer: {}", e))?;
+    }
+
+    Ok("Installer launched successfully. Follow the on-screen prompts to complete setup.".to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -102,7 +143,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             spawn_agent,
             download_desktop_agent,
-            export_official_document
+            export_official_document,
+            install_desktop_update
         ])
         .setup(|app| {
             let quit_i = MenuItem::with_id(app, "quit", "Quit AgentBoost", true, None::<&str>).unwrap();

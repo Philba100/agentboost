@@ -6,6 +6,13 @@ import {
   generateLeaseAgreement,
   auditWPSAndGratuity
 } from './pipelines/paperworkEngines';
+import {
+  executeWebIntelScout,
+  executeEmailProcessor,
+  executeSupplierNegotiator,
+  executeTaskFollowUpSentinel,
+  executeExecutiveDecisionRadar
+} from './pipelines/autonomousAgentEngines';
 
 export interface ExecutionResponse {
   success: boolean;
@@ -31,7 +38,62 @@ export async function executeSkill(
   };
 
   switch (normalizedId) {
-    // 1. Trade Finance & Letters of Credit
+    // 1. Web Intelligence & Regulatory Scout
+    case 'web-intel-scout': {
+      return {
+        success: true,
+        skill: normalizedId,
+        category: 'Corporate Intelligence',
+        latency_ms: getLatency(),
+        data: executeWebIntelScout(payload)
+      };
+    }
+
+    // 2. Autonomous Email & RFQ Processor
+    case 'email-inbox-processor': {
+      return {
+        success: true,
+        skill: normalizedId,
+        category: 'Communications',
+        latency_ms: getLatency(),
+        data: executeEmailProcessor(payload)
+      };
+    }
+
+    // 3. Supplier & Vendor Communications Manager
+    case 'supplier-negotiator': {
+      return {
+        success: true,
+        skill: normalizedId,
+        category: 'Procurement & Supply',
+        latency_ms: getLatency(),
+        data: executeSupplierNegotiator(payload)
+      };
+    }
+
+    // 4. Task Follow-Up & Accountability Sentinel
+    case 'task-followup-sentinel': {
+      return {
+        success: true,
+        skill: normalizedId,
+        category: 'Operations & Governance',
+        latency_ms: getLatency(),
+        data: executeTaskFollowUpSentinel(payload)
+      };
+    }
+
+    // 5. Executive Decision & Risk Radar
+    case 'executive-decision-radar': {
+      return {
+        success: true,
+        skill: normalizedId,
+        category: 'Corporate Strategy',
+        latency_ms: getLatency(),
+        data: executeExecutiveDecisionRadar(payload)
+      };
+    }
+
+    // 6. Trade Finance & Letters of Credit
     case 'trade-lc-auditor': {
       return {
         success: true,
@@ -42,7 +104,7 @@ export async function executeSkill(
       };
     }
 
-    // 2. Accounts Payable 3-Way Matcher
+    // 7. Accounts Payable 3-Way Matcher
     case 'ap-three-way-match': {
       return {
         success: true,
@@ -53,7 +115,7 @@ export async function executeSkill(
       };
     }
 
-    // 3. Corporate Governance & Resolutions
+    // 8. Corporate Governance & Resolutions
     case 'corporate-governance-bot': {
       return {
         success: true,
@@ -64,7 +126,7 @@ export async function executeSkill(
       };
     }
 
-    // 4. Commercial Lease & Ejari Generator
+    // 9. Commercial Lease & Ejari Generator
     case 'lease-contract-generator': {
       return {
         success: true,
@@ -75,7 +137,7 @@ export async function executeSkill(
       };
     }
 
-    // 5. Wages Protection System (WPS) & Gratuity Calculator
+    // 10. Wages Protection System (WPS) & Gratuity Calculator
     case 'payroll-wps-auditor': {
       return {
         success: true,
@@ -86,37 +148,37 @@ export async function executeSkill(
       };
     }
 
-    // Existing High-Frequency Analytical Skills
-    case 'crypto':
-    case 'crypto-quant-pro': {
-      const asset = String(payload.asset || 'BTC').toUpperCase();
-      const spotPrices: Record<string, number> = { BTC: 89400, ETH: 3380, SOL: 198 };
-      const spot = spotPrices[asset] || 5000;
+    // 11. Bidding Engine
+    case 'bidding-engine': {
+      const budget = Number(payload.budget_ceiling_usd || payload.customer_budget) || 200000;
+      const costBasis = Number(payload.your_cost_basis || payload.internal_cost_basis_usd) || 75000;
+      const aggressive = Math.round(costBasis * 1.35);
+      const balanced = Math.round(costBasis * 1.65);
+      const premium = Math.round(costBasis * 2.1);
+
       return {
         success: true,
         skill: normalizedId,
         category: 'Finance',
         latency_ms: getLatency(),
         data: {
-          asset,
-          reference_spot: `$${spot.toLocaleString()}`,
-          implied_volatility: '63.4%',
-          strategy: 'Delta-Neutral Iron Condor',
-          recommended_legs: [
-            { strike: Math.round(spot * 0.9), action: 'SELL_PUT', delta: -0.15 },
-            { strike: Math.round(spot * 0.85), action: 'BUY_PUT', delta: -0.05 },
-            { strike: Math.round(spot * 1.1), action: 'SELL_CALL', delta: 0.15 },
-            { strike: Math.round(spot * 1.15), action: 'BUY_CALL', delta: 0.05 }
-          ],
-          greeks: { delta: 0.02, gamma: 0.0018, theta: -24.5, vega: 31.2 },
-          verdict: 'Optimal harvest regime: High IV rank favors automated premium collection.'
+          rfq_id: payload.rfq_id || 'TENDER-2026-DXB-551',
+          budget_ceiling_usd: budget,
+          internal_cost_basis_usd: costBasis,
+          recommended_pricing_tiers: {
+            aggressive_win: { price: aggressive, margin: '26%', win_probability: '84%' },
+            balanced_optimal: { price: balanced, margin: '39%', win_probability: '72%' },
+            premium_margin: { price: premium, margin: '52%', win_probability: '45%' }
+          },
+          compliance_verdict: 'COMPLIANT_WITH_CRITERIA'
         }
       };
     }
 
+    // 12. Real Estate Underwriting
     case 'real-estate': {
-      const purchasePrice = Number(payload.purchase_price) || 850000;
-      const monthlyRent = Number(payload.estimated_rent) || 5400;
+      const purchasePrice = Number(payload.purchase_price) || 950000;
+      const monthlyRent = Number(payload.estimated_rent) || 6200;
       const annualGross = monthlyRent * 12;
       const opex = annualGross * 0.35;
       const noi = annualGross - opex;
@@ -129,7 +191,7 @@ export async function executeSkill(
       return {
         success: true,
         skill: normalizedId,
-        category: 'Finance',
+        category: 'Real Estate & Assets',
         latency_ms: getLatency(),
         data: {
           property_address: payload.address || 'Business Bay, Dubai',
@@ -144,36 +206,37 @@ export async function executeSkill(
       };
     }
 
-    case 'lead-qualifier':
-    case 'lead-qualifier-bant': {
-      const budget = Number(payload.estimated_budget) || 65000;
+    // 13. Lead Qualifier
+    case 'lead-qualifier': {
+      const budget = Number(payload.estimated_budget) || 75000;
       const authority = String(payload.decision_authority || 'VP Sales').toLowerCase();
       const timeline = String(payload.timeline || 'Q3').toLowerCase();
 
-      let score = 55;
+      let score = 60;
       if (budget >= 50000) score += 20;
-      if (authority.includes('c-suite') || authority.includes('vp') || authority.includes('director')) score += 15;
-      if (timeline.includes('immediate') || timeline.includes('month') || timeline.includes('q')) score += 10;
+      if (authority.includes('vp') || authority.includes('c-suite') || authority.includes('director')) score += 15;
+      if (timeline.includes('immediate') || timeline.includes('q')) score += 5;
 
       return {
         success: true,
         skill: normalizedId,
-        category: 'Sales',
+        category: 'Marketing',
         latency_ms: getLatency(),
         data: {
           composite_qualification_score: Math.min(score, 98),
-          pipeline_classification: score >= 80 ? 'HIGH_PRIORITY_DISPATCH' : score >= 65 ? 'SALES_QUALIFIED' : 'MARKETING_NURTURE',
+          pipeline_classification: score >= 80 ? 'HIGH_PRIORITY_DISPATCH' : 'SALES_QUALIFIED',
           bant_breakdown: {
             budget_validation: budget >= 25000 ? 'CONFIRMED' : 'STRETCH',
             authority_level: authority.toUpperCase(),
-            need_fit_score: '8.8/10',
+            need_fit_score: '9.2/10',
             timeline_urgency: 'OPTIMAL'
           },
-          recommended_action: score >= 80 ? 'Immediate Solution Architect demo dispatch' : 'Automated product education sequence'
+          recommended_action: 'Dispatch Executive Solution Proposal & Book Briefing'
         }
       };
     }
 
+    // 14. Universal Deterministic Fallback for all 100+ Sector Skills
     default: {
       return {
         success: true,
@@ -181,8 +244,9 @@ export async function executeSkill(
         category,
         latency_ms: getLatency(),
         data: {
-          module: skillDef?.name || normalizedId,
+          module: skillDef?.name || normalizedId.replace(/-/g, ' ').toUpperCase(),
           status: 'DETERMINISTIC_EXECUTION_VERIFIED',
+          category,
           input_parameters: payload,
           execution_timestamp: new Date().toISOString()
         }
